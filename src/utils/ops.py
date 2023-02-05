@@ -28,7 +28,7 @@ class bigConv(nn.Module):
 
 class graphConvPool(nn.Module):
 
-    def __init__(self, k, in_dim, p, act):
+    def __init__(self, k, in_dim, act):
         self.k = k
         self.scoregen = GCNConv(in_dim, 1)
         self.act = act
@@ -41,7 +41,7 @@ class graphConvPool(nn.Module):
         adj_mat_new = adj_mat[indices, :]
         e2 = adj_mat_new.nonzero().t().continguous()
 
-        return pooled, e2
+        return pooled, e2, indices
         
     def forward(self, x, edge_index):
         p1 = self.scoregen(x, edge_index)
@@ -50,20 +50,16 @@ class graphConvPool(nn.Module):
 
 class graphConvUnpool(nn.Module):
 
-    def __init__(self, x_skip, e_skip, indices, x, act):
+    def __init__(self,  act):
         super(graphConvUnpool, self).__init__()
-        self.x_skip = x_skip
-        self.x = x
-        self.e_skip = e_skip
-        self.indices = indices
         self.act = act
 
-    def forward(self):
+    def forward(self, x_skip, e_skip, indices, x):
 
-        unpooled_x = torch.zeros(size=self.x_skip.shape)
-        unpooled_x[self.indices] = self.x
-        unpooled_x = GCNConv(unpooled_x, self.e_skip)
-        return self.act(unpooled_x)
+        unpooled_x = torch.zeros(size=x_skip.shape)
+        unpooled_x[indices] = x
+        unpooled_x = GCNConv(unpooled_x, e_skip)
+        return self.act(unpooled_x), e_skip
 
 
 class maxDeltaAgeLoss:

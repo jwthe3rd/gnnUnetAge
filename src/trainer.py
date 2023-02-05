@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from network import GraphConvUnet_age
 from utils.dataset import data_generator, gnnAgeDataSet
 from torch_geometric.loader import DataLoader
 import torch.nn.functional as F
