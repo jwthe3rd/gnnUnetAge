@@ -60,6 +60,6 @@ class gnnAgeDataSet(Dataset):
         edge_index = torch.load(self.edge_paths[idx])
         Y = torch.load(self.label_paths[idx])
 
-        data = Data(x=X, edge_index = edge_index, y=Y)
+        data = Data(x=X, edge_index = edge_index, y=Y, Re=12)
 
         return data 

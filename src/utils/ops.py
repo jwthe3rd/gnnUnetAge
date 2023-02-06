@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 from torch_geometric.nn import SAGEConv, BatchNorm, GCNConv
-from torch_geometric.utils import to_dense_adj
+from torch_geometric.utils import to_dense_adj, dense_to_sparse, add_self_loops, remove_isolated_nodes
 import numpy as np
-
+import math
 
 
 class bigConv(nn.Module):
@@ -17,6 +17,7 @@ class bigConv(nn.Module):
         self.batchNorm = BatchNorm(in_dim) if batchNorm else nn.Identity()
 
     def forward(self, x, edge_index):
+        edge_index = add_self_loops(edge_index)[0]
 
         l1 = self.batchNorm(x)
         l1 = self.conv(x, edge_index)
@@ -34,19 +35,43 @@ class graphConvPool(nn.Module):
         self.scoregen = GCNConv(in_dim, 1)
         self.act = act
 
-    def top_k_pool(self, g, e1):
-        num_nodes = g.shape[0]
-        g = g.T
-        pooled, indices = torch.topk(g, max(2, int(self.k*num_nodes)))
-        g = g.T
+    def remove_obstacle(self,max, shape, indices):
+        if max >= shape:
+            idx = torch.argmax(indices[0]).item()
+            print(indices.shape)
+            indices_2 = torch.cat([indices[0][0:idx], indices[0][idx+1:]])
+            print(indices_2.shape)
+            indices_2 = torch.reshape(indices_2, (1, indices_2.shape[0]))
+            new_max = torch.max(indices_2[0]).item()
+            return self.remove_obstacle(new_max, shape, indices_2)
+            
+        else:
+            return max, shape, indices
+
+    def top_k_pool(self, g, e1, scores):
+        num_nodes = scores.shape[0]
+        scores = scores.T
+        pooled, indices = torch.topk(scores, max(2, math.floor(self.k*num_nodes)))
         new_g = g[indices,:]
+        new_g = new_g[0]
+        e1 = to_dense_adj(e1)
+        print(e1.shape[1])
+        print(torch.max(indices[0]).item())
+        print(torch.argmax(indices[0]).item())
+        m, s, indices = self.remove_obstacle(torch.max(indices[0]).item(), e1.shape[1], indices)
+        new_g = g[indices,:]
+        new_g = new_g[0]
+        e1 = e1[0][indices, :]
+        e1 = e1[0].T
         e1 = e1[indices, :]
+        e1 = e1[0].T
+        e1 = e1.nonzero().t().contiguous()
 
         return new_g, e1, indices
         
     def forward(self, x, edge_index):
         p1 = self.scoregen(x, edge_index)
-        return self.top_k_pool(p1, edge_index)
+        return self.top_k_pool(x, edge_index, p1)
 
 class graphConvUnpool(nn.Module):
 
