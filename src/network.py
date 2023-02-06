@@ -16,6 +16,8 @@ class AgeNet(nn.Module):
         self.unpools = nn.ModuleList()
         self.conv_act = conv_act
         self.pool_act = pool_act
+        #self.up_conv_dims = [int(j) for j in args.up_conv_dims.split()]
+        #self.down_conv_dims = [int(j) for j in args.down_conv_dims.split()]
         self.up_conv_dims = args.up_conv_dims
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
@@ -23,14 +25,26 @@ class AgeNet(nn.Module):
         self.bottom_conv = bigConv(args.lat_dim+1, args.lat_dim, self.conv_act, 0, False)
         self.smooth_conv = bigConv(n_classes, n_classes, self.conv_act, 0, False)
         self.Re_mat = Re_mat
+        self.num_features = args.num_features
+        self.lat_dim = args.lat_dim
 
-        for dim in self.down_conv_dims:
-            self.down_convs.append(bigConv(dim[0], dim[1], self.conv_act, 0.2, False ))
-            self.pools.append(graphConvPool(0.5, dim[1], self.pool_act))
 
-        for dim in self.up_conv_dims:
-            self.up_convs.append(bigConv(dim[0], dim[1], self.conv_act, 0.2, False ))
-            self.pools.append(graphConvUnpool(self.pool_act)) 
+
+        for i, dim in enumerate(self.down_conv_dims):
+            if i == 0:
+                self.down_convs.append(bigConv(self.num_features, dim, self.conv_act, 0.2, False ))
+                self.pools.append(graphConvPool(0.5, dim, self.pool_act))
+            else:
+                self.down_convs.append(bigConv(self.down_conv_dims[i-1], dim, self.conv_act, 0.2, False ))
+                self.pools.append(graphConvPool(0.5, dim, self.pool_act))
+
+        for i, dim in enumerate(self.up_conv_dims):
+            if i == 0:
+                self.up_convs.append(bigConv(self.lat_dim, dim, self.conv_act, 0.2, False ))
+                self.pools.append(graphConvUnpool(self.pool_act)) 
+            else:
+                self.up_convs.append(bigConv(self.up_conv_dims[i-1], dim, self.conv_act, 0.2, False ))
+                self.pools.append(graphConvUnpool(self.pool_act)) 
 
     def forward(self, input):
 

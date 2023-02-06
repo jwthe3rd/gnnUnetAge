@@ -29,13 +29,19 @@ class bigConv(nn.Module):
 class graphConvPool(nn.Module):
 
     def __init__(self, k, in_dim, act):
+        super(graphConvPool, self).__init__()
         self.k = k
         self.scoregen = GCNConv(in_dim, 1)
         self.act = act
 
     def top_k_pool(self, g, e1):
         num_nodes = g.shape[0]
-        pooled, indices = torch.topk(g, max(2, self.k*num_nodes))
+        print(num_nodes)
+        print(g.shape)
+        print(max(2, int(self.k*num_nodes)))
+        for i in range(1000000000):
+            continue
+        pooled, indices = torch.topk(g, max(2, int(self.k*num_nodes)))
         g = self.act(g)
         adj_mat = to_dense_adj(e1)
         adj_mat_new = adj_mat[indices, :]
@@ -44,7 +50,7 @@ class graphConvPool(nn.Module):
         return pooled, e2, indices
         
     def forward(self, x, edge_index):
-        p1 = self.scoregen(x, edge_index)
+        p1 = self.scoregen(x, edge_index).squeeze()
 
         return self.top_k_pool(p1, edge_index)
 
