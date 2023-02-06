@@ -64,23 +64,15 @@ class AgeNet(nn.Module):
             edge_skips.append(edge_index)
             x, edge_index, indc = self.pools[i](x, edge_index)
             indcs.append(indc)
-            print(f'pool_{i}')
         Re_mat = np.repeat(input.Re[0].item(), x.shape[0])
         Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], 1))
         x = torch.cat((x, Re_mat), 1)
         x = self.bottom_conv(x, edge_index)
 
-        for tensor in x_skips:
-            print(tensor.shape)
-
         for i in range(self.depth):
-            print(i)
-            print(len(self.up_convs))
 
             up_idx = self.depth - i - 1
             skip, edge, indc = x_skips[up_idx], edge_skips[up_idx], indcs[up_idx]
-            print(up_idx)
-            print(x_skips[up_idx].shape)
             x, edge_index = self.unpools[i](skip, edge, indc, x)
             x = torch.cat((x, skip), -1)
             x = self.up_convs[i](x, edge_index)

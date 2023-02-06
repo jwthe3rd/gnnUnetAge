@@ -38,9 +38,7 @@ class graphConvPool(nn.Module):
     def remove_obstacle(self,max, shape, indices):
         if max >= shape:
             idx = torch.argmax(indices[0]).item()
-            print(indices.shape)
             indices_2 = torch.cat([indices[0][0:idx], indices[0][idx+1:]])
-            print(indices_2.shape)
             indices_2 = torch.reshape(indices_2, (1, indices_2.shape[0]))
             new_max = torch.max(indices_2[0]).item()
             return self.remove_obstacle(new_max, shape, indices_2)
@@ -55,9 +53,6 @@ class graphConvPool(nn.Module):
         new_g = g[indices,:]
         new_g = new_g[0]
         e1 = to_dense_adj(e1)
-        print(e1.shape[1])
-        print(torch.max(indices[0]).item())
-        print(torch.argmax(indices[0]).item())
         m, s, indices = self.remove_obstacle(torch.max(indices[0]).item(), e1.shape[1], indices)
         new_g = g[indices,:]
         new_g = new_g[0]
@@ -83,12 +78,8 @@ class graphConvUnpool(nn.Module):
     def forward(self, x_skip, e_skip, indices, x):
 
         unpooled_x = torch.zeros(size=x_skip.shape)
-        print(f'indices are : {indices.shape}')
-        print(f'unpooled amt is : {unpooled_x.shape}')
-        print(f'x shape is : {x.shape}')
         #indices = indices.squeeze()
         unpooled_x[indices] = x
-        print(f'transformed unpooled shape is {unpooled_x.shape}')
         #unpooled_x = self.unpoolconv(unpooled_x, e_skip)
         return self.act(unpooled_x), e_skip
 
