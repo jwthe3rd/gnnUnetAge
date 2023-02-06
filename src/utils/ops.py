@@ -36,22 +36,16 @@ class graphConvPool(nn.Module):
 
     def top_k_pool(self, g, e1):
         num_nodes = g.shape[0]
-        print(num_nodes)
-        print(g.shape)
-        print(max(2, int(self.k*num_nodes)))
-        for i in range(1000000000):
-            continue
+        g = g.T
         pooled, indices = torch.topk(g, max(2, int(self.k*num_nodes)))
-        g = self.act(g)
-        adj_mat = to_dense_adj(e1)
-        adj_mat_new = adj_mat[indices, :]
-        e2 = adj_mat_new.nonzero().t().continguous()
+        g = g.T
+        new_g = g[indices,:]
+        e1 = e1[indices, :]
 
-        return pooled, e2, indices
+        return new_g, e1, indices
         
     def forward(self, x, edge_index):
-        p1 = self.scoregen(x, edge_index).squeeze()
-
+        p1 = self.scoregen(x, edge_index)
         return self.top_k_pool(p1, edge_index)
 
 class graphConvUnpool(nn.Module):
@@ -77,7 +71,7 @@ class maxDeltaAgeLoss:
         self.pred = pred
 
     def delta_mat_gen(self):
-        adj_mat = to_dense_adj(self.e)
+        # adj_mat = to_dense_adj(self.e)
         new_mat = adj_mat*self.pred[None, :]
         subbed = torch.sub(new_mat, self.pred)
         delta_mat = subbed*adj_mat
