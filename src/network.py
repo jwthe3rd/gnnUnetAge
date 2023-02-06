@@ -40,10 +40,13 @@ class AgeNet(nn.Module):
 
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
-                self.up_convs.append(bigConv(2*self.lat_dim, dim, self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(2*self.lat_dim, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
+                self.unpools.append(graphConvUnpool(self.pool_act))
+            elif i == self.depth-1:
+                self.up_convs.append(bigConv(dim*2, 102, self.conv_act, 0.0, False)) 
                 self.unpools.append(graphConvUnpool(self.pool_act)) 
             else:
-                self.up_convs.append(bigConv(self.up_conv_dims[i-1]*2, dim, self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
                 self.unpools.append(graphConvUnpool(self.pool_act)) 
 
     def forward(self, input):
@@ -67,13 +70,17 @@ class AgeNet(nn.Module):
         x = torch.cat((x, Re_mat), 1)
         x = self.bottom_conv(x, edge_index)
 
-        print(x)
-        print(x.shape)
+        for tensor in x_skips:
+            print(tensor.shape)
 
         for i in range(self.depth):
+            print(i)
+            print(len(self.up_convs))
 
             up_idx = self.depth - i - 1
             skip, edge, indc = x_skips[up_idx], edge_skips[up_idx], indcs[up_idx]
+            print(up_idx)
+            print(x_skips[up_idx].shape)
             x, edge_index = self.unpools[i](skip, edge, indc, x)
             x = torch.cat((x, skip), -1)
             x = self.up_convs[i](x, edge_index)

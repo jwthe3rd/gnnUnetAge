@@ -36,7 +36,7 @@ class Trainer:
         optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
         optimizer.zero_grad()
         out = self.model(batch)
-        loss = F.mse_loss(out, batch.y)
+        loss = F.nll_loss(out, batch.y)
         loss.backward()
         optimizer.step()
         train_loss += loss.item()

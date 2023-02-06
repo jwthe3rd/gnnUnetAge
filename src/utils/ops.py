@@ -83,7 +83,12 @@ class graphConvUnpool(nn.Module):
     def forward(self, x_skip, e_skip, indices, x):
 
         unpooled_x = torch.zeros(size=x_skip.shape)
+        print(f'indices are : {indices.shape}')
+        print(f'unpooled amt is : {unpooled_x.shape}')
+        print(f'x shape is : {x.shape}')
+        #indices = indices.squeeze()
         unpooled_x[indices] = x
+        print(f'transformed unpooled shape is {unpooled_x.shape}')
         #unpooled_x = self.unpoolconv(unpooled_x, e_skip)
         return self.act(unpooled_x), e_skip
 
