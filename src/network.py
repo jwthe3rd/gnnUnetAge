@@ -40,10 +40,10 @@ class AgeNet(nn.Module):
 
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
-                self.up_convs.append(bigConv(self.lat_dim, dim, self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(2*self.lat_dim, dim, self.conv_act, 0.2, False ))
                 self.unpools.append(graphConvUnpool(self.pool_act)) 
             else:
-                self.up_convs.append(bigConv(self.up_conv_dims[i-1], dim, self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(self.up_conv_dims[i-1]*2, dim, self.conv_act, 0.2, False ))
                 self.unpools.append(graphConvUnpool(self.pool_act)) 
 
     def forward(self, input):
