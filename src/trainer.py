@@ -32,18 +32,21 @@ class Trainer:
         self.model.to(self.device)
         return 0
 
-    def train_step(self, batch, batch_num, loader, train_loss):
+    def train_step(self, batch, batch_num, loader, train_loss, accur):
         optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
         optimizer.zero_grad()
         out = self.model(batch)
         loss = F.nll_loss(out, batch.y)
+        _, preds = torch.max(out, 1)
+        acc = torch.mean((preds == batch.y).float())
         loss.backward()
         optimizer.step()
         train_loss += loss.item()
+        accur += acc.item()
         print ("\033[A                             \033[A")
-        print(f"{int(100*batch_num/len(loader))} % ||| Training MSE Loss = {round(train_loss / (batch_num+1),2)}                     ")
-        return 0
-    
+        print(f"{int(100*batch_num/len(loader))} % ||| Training MSE Loss = {round(train_loss / (batch_num+1),2)}    ||| Training Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
+        return train_loss, accur
+
     def train(self):
         self.load_data()
         self.to_device()
@@ -51,9 +54,11 @@ class Trainer:
             print('\n')
             train_loss = 0
             val_loss = 0
+            accur = 0
             for i,batch in enumerate(self.loader):
                 batch = batch.to(self.device)
-                train_loss = self.train_step(batch_num=i, batch=batch, loader=self.loader, train_loss=train_loss)
+                train_loss, accur = self.train_step(batch_num=i, batch=batch, loader=self.loader, train_loss=train_loss, accur=accur)
+
 
 
 

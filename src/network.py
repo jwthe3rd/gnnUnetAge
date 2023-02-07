@@ -22,7 +22,7 @@ class AgeNet(nn.Module):
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
         self.in_dims = in_dims
-        self.bottom_conv = bigConv(args.lat_dim+1, args.lat_dim, self.conv_act, 0, False)
+        self.bottom_conv = bigConv(args.lat_dim+2, args.lat_dim, self.conv_act, 0, False)
         self.smooth_conv = bigConv(n_classes, n_classes, self.conv_act, 0, False)
         self.Re_mat = Re_mat
         self.num_features = args.num_features
@@ -66,7 +66,9 @@ class AgeNet(nn.Module):
             indcs.append(indc)
         Re_mat = np.repeat(input.Re[0].item(), x.shape[0])
         Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], 1))
-        x = torch.cat((x, Re_mat), 1)
+        baffle_mat = np.repeat(input.bafflesze[0].item(), x.shape[0])
+        baffle_mat = torch.reshape(torch.Tensor(baffle_mat), (x.shape[0], 1))
+        x = torch.cat((x, Re_mat, baffle_mat), 1)
         x = self.bottom_conv(x, edge_index)
 
         for i in range(self.depth):
