@@ -63,10 +63,6 @@ class gnnAgeDataSet(Dataset):
         Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
         bafflesze = int(self.feats_paths[idx][len(self.feats_paths[idx])-10])
 
-
-        print(Re_num)
-        print(bafflesze)
-
         data = Data(x=X, edge_index = edge_index, y=Y, Re=Re_num, bafflesze=bafflesze)
 
         return data 
