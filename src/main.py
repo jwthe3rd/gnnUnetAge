@@ -11,6 +11,8 @@ def get_args():
     parser.add_argument('-batch_size', type=int, default=1, help='batch_size')
     parser.add_argument('-seed', type=int, default=24, help='seed')
     parser.add_argument('-num_epochs', type=int, default=100, help='num_epochs')
+    parser.add_argument('-n_classes', type=int, default=100, help='n_classes')
+    parser.add_argument('-k_p', type=float, default=0.5, help='k_p')
     parser.add_argument('-num_features', type=int, default=100, help='num_features')
     parser.add_argument('-lat_dim', type=int, default=5, help='lat_dim')
     parser.add_argument('-lr', type=float, default=0.01, help='lr')
@@ -35,7 +37,7 @@ if __name__=="__main__":
 
     print(options)
 
-    model = AgeNet(6, 100, args, [0.7, 0.7, 0.7], torch.tanh, torch.tanh, torch.Tensor([1,1]))
+    model = AgeNet(6, args, [0.7, 0.7, 0.7], torch.tanh, torch.tanh, torch.Tensor([1,1]))
 
     print(args.up_conv_dims)
 

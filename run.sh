@@ -28,7 +28,9 @@ run(){
         -down_conv_dims $down_conv_dims \
         -lat_dim $lat_dim \
         -num_features $num_features \
-        -seed $seed
+        -seed $seed \
+        -n_classes $n_classes \
+        -k_p $k_p
 	}
 
 
