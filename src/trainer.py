@@ -22,9 +22,11 @@ class Trainer:
     def load_data(self):
 
         y, x, e = data_generator(path=self.path, seed=self.seed).segment_data()
-        dataset = gnnAgeDataSet(e, x, y)
+        training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
+        validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
 
-        self.loader = DataLoader(dataset, batch_size=self.batch_size)
+        self.train_loader = DataLoader(training_dataset, batch_size=self.batch_size)
+        self.val_loader = DataLoader(validation_dataset, batch_size=self.batch_size)
 
         return 0
 
@@ -46,6 +48,22 @@ class Trainer:
         print ("\033[A                             \033[A")
         print(f"{int(100*batch_num/len(loader))} % ||| Training MSE Loss = {round(train_loss / (batch_num+1),2)}    ||| Training Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
         return train_loss, accur
+    
+    @torch.no_grad()
+    def val_step(self, batch, batch_num, loader, val_loss, accur):
+        # optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
+        # optimizer.zero_grad()
+        out = self.model(batch)
+        loss = F.nll_loss(out, batch.y)
+        _, preds = torch.max(out, 1)
+        acc = torch.mean((preds == batch.y).float())
+        # loss.backward()
+        # optimizer.step()
+        val_loss += loss.item()
+        accur += acc.item()
+        print ("\033[A                             \033[A")
+        print(f"{int(100*batch_num/len(loader))} % ||| Validation MSE Loss = {round(val_loss / (batch_num+1),2)}    ||| Validation Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
+        return val_loss, accur
 
     def train(self):
         self.load_data()
@@ -54,10 +72,14 @@ class Trainer:
             print('\n')
             train_loss = 0
             val_loss = 0
-            accur = 0
-            for i,batch in enumerate(self.loader):
+            train_accur = 0
+            val_accur = 0
+            for i,batch in enumerate(self.train_loader):
                 batch = batch.to(self.device)
-                train_loss, accur = self.train_step(batch_num=i, batch=batch, loader=self.loader, train_loss=train_loss, accur=accur)
+                train_loss, train_accur = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur)
+            for i,batch in enumerate(self.val_loader):
+                batch = batch.to(self.device)
+                val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur)
 
 
 
