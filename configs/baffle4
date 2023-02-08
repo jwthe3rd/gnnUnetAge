@@ -1,0 +1,14 @@
+batch_size=2
+data_path="./data/"
+num_epochs=200
+device="cpu"
+lr=0.001
+max_v=1.0
+max_L=0.001
+up_conv_dims="50 100 200 250"
+down_conv_dims="250 200 100 50"
+lat_dim=50
+num_features=8
+seed=27
+n_classes=15
+k_p=0.7

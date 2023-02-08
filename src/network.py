@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.ops import bigConv, graphConvPool, graphConvUnpool
+from utils.ops import bigConv, graphConvPool, graphConvUnpool, Initializer
 
 
 class AgeNet(nn.Module):
@@ -48,7 +48,9 @@ class AgeNet(nn.Module):
                 self.unpools.append(graphConvUnpool(self.pool_act)) 
             else:
                 self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
-                self.unpools.append(graphConvUnpool(self.pool_act)) 
+                self.unpools.append(graphConvUnpool(self.pool_act))
+
+        Initializer.weights_init(self) 
 
     def forward(self, input):
 

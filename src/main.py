@@ -35,11 +35,7 @@ if __name__=="__main__":
 
     options = vars(args)
 
-    print(options)
-
     model = AgeNet(6, args, [0.7, 0.7, 0.7], torch.tanh, torch.tanh, torch.Tensor([1,1]))
-
-    print(args.up_conv_dims)
 
     trainer = Trainer(args,model, torch.optim.Adam)
     trainer.train()

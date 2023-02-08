@@ -34,7 +34,7 @@ class Trainer:
         self.model.to(self.device)
         return 0
 
-    def train_step(self, batch, batch_num, loader, train_loss, accur):
+    def train_step(self, batch, batch_num, loader, train_loss, accur, epoch, best_loss, best_acc):
         optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
         optimizer.zero_grad()
         out = self.model(batch)
@@ -45,20 +45,24 @@ class Trainer:
         optimizer.step()
         train_loss += loss.item()
         accur += acc.item()
+        if best_acc < 100*round(accur / (batch_num+1),2):
+            best_acc = 100*round(accur / (batch_num+1),2)
+        if best_loss > round(train_loss / (batch_num+1),2):
+            best_loss = round(train_loss / (batch_num+1),2)
         print ("\033[A                             \033[A")
-        print(f"{int(100*batch_num/len(loader))} % ||| Training MSE Loss = {round(train_loss / (batch_num+1),2)}    ||| Training Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
-        return train_loss, accur
+        print(f"Epoch:{epoch} | {int(100*batch_num/len(loader))} % | T NLL Loss = {round(train_loss / (batch_num+1),2)}  Best Loss: {best_loss}| T Acc = {100*round(accur / (batch_num+1),2)} %  Best Acc: {best_acc} %                           ")
+        return train_loss, accur, best_loss, best_acc
     
     @torch.no_grad()
-    def val_step(self, batch, batch_num, loader, val_loss, accur):
+    def val_step(self, batch, batch_num, loader, val_loss, accur, epoch):
         out = self.model(batch)
         loss = F.nll_loss(out, batch.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == batch.y).float())
         val_loss += loss.item()
         accur += acc.item()
-        print ("\033[A                             \033[A")
-        print(f"{int(100*batch_num/len(loader))} % ||| Validation MSE Loss = {round(val_loss / (batch_num+1),2)}    ||| Validation Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
+        #print ("\033[A                             \033[A")
+        print(f"Epoch: {epoch}   {int(100*batch_num/len(loader))} % ||| Validation Negative Log-Likelihood Loss = {round(val_loss / (batch_num+1),2)}    ||| Validation Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
         return val_loss, accur
 
     def train(self):
@@ -75,12 +79,14 @@ class Trainer:
             val_loss = 0
             train_accur = 0
             val_accur = 0
+            best_loss = float('inf')
+            best_acc = float('-inf')
             for i,batch in enumerate(self.train_loader):
                 batch = batch.to(self.device)
-                train_loss, train_accur = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur)
+                train_loss, train_accur, best_loss, best_acc = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur, epoch=epoch, best_loss=best_loss, best_acc=best_acc)
             for i,batch in enumerate(self.val_loader):
                 batch = batch.to(self.device)
-                val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur)
+                val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur, epoch=epoch)
 
             self.training_loss.append(train_loss/len(self.train_loader))
             self.validation_loss.append(val_loss/len(self.val_loader))
