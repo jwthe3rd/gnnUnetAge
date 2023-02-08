@@ -1,4 +1,4 @@
-batch_size=1
+batch_size=4
 data_path="./data/"
 num_epochs=2
 device="cpu"
