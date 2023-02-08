@@ -51,14 +51,10 @@ class Trainer:
     
     @torch.no_grad()
     def val_step(self, batch, batch_num, loader, val_loss, accur):
-        # optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
-        # optimizer.zero_grad()
         out = self.model(batch)
         loss = F.nll_loss(out, batch.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == batch.y).float())
-        # loss.backward()
-        # optimizer.step()
         val_loss += loss.item()
         accur += acc.item()
         print ("\033[A                             \033[A")
@@ -68,6 +64,11 @@ class Trainer:
     def train(self):
         self.load_data()
         self.to_device()
+        self.training_loss = []
+        self.validation_loss =[]
+        self.training_acc = []
+        self.validation_acc = []
+        epoch_plot = np.linspace(0,self.num_epochs,self.num_epochs)
         for epoch in range(self.num_epochs):
             print('\n')
             train_loss = 0
@@ -81,6 +82,20 @@ class Trainer:
                 batch = batch.to(self.device)
                 val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur)
 
+            self.training_loss.append(train_loss/len(self.train_loader))
+            self.validation_loss.append(val_loss/len(self.val_loader))
+            self.training_acc.append(train_accur/len(self.train_loader))
+            self.validation_acc.append(val_accur/len(self.val_loader))
+
+        plt.plot(epoch_plot,self.training_loss, label="training nll loss")
+        plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
+        plt.legend()
+        plt.savefig('./figs/loss_plot.png')
+
+        plt.plot(epoch_plot,self.training_acc, label="training accuracy")
+        plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
+        plt.legend()
+        plt.savefig('./figs/accuracy_plot.png')
 
 
 

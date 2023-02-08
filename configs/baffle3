@@ -1,6 +1,6 @@
 batch_size=1
 data_path="./data/"
-num_epochs=200
+num_epochs=2
 device="cpu"
 lr=0.005
 max_v=1.0
