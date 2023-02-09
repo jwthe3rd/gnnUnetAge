@@ -70,17 +70,17 @@ class graphConvPool(nn.Module):
 
 class graphConvUnpool(nn.Module):
 
-    def __init__(self,  act):
+    def __init__(self,  act, dim):
         super(graphConvUnpool, self).__init__()
         self.act = act
-        #self.unpoolconv = GCNConv(dim1, dim2)
+        self.unpoolconv = GCNConv(dim, dim)
 
     def forward(self, x_skip, e_skip, indices, x):
 
         unpooled_x = torch.zeros(size=x_skip.shape)
         #indices = indices.squeeze()
         unpooled_x[indices] = x
-        #unpooled_x = self.unpoolconv(unpooled_x, e_skip)
+        unpooled_x = self.unpoolconv(unpooled_x, e_skip)
         return self.act(unpooled_x), e_skip
 
 

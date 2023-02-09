@@ -42,13 +42,13 @@ class AgeNet(nn.Module):
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
                 self.up_convs.append(bigConv(2*self.lat_dim, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
-                self.unpools.append(graphConvUnpool(self.pool_act))
+                self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i]))
             elif i == self.depth-1:
                 self.up_convs.append(bigConv(dim*2, self.n_classes, self.conv_act, 0.0, False)) 
-                self.unpools.append(graphConvUnpool(self.pool_act)) 
+                self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i])) 
             else:
                 self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
-                self.unpools.append(graphConvUnpool(self.pool_act))
+                self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i]))
 
         Initializer.weights_init(self) 
 
