@@ -32,7 +32,7 @@ class graphConvPool(nn.Module):
     def __init__(self, k, in_dim, act):
         super(graphConvPool, self).__init__()
         self.k = k
-        self.scoregen = GCNConv(in_dim, 1)
+        self.scoregen = nn.Linear(in_dim, 1)
         self.act = act
 
     def remove_obstacle(self,max, shape, indices):
@@ -65,7 +65,7 @@ class graphConvPool(nn.Module):
         return new_g, e1, indices
         
     def forward(self, x, edge_index):
-        p1 = self.scoregen(x, edge_index)
+        p1 = self.scoregen(x)
         return self.top_k_pool(x, edge_index, p1)
 
 class graphConvUnpool(nn.Module):
