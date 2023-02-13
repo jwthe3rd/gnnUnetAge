@@ -19,6 +19,8 @@ run() {
     -num_features $num_features \
     -seed $seed \
     -n_classes $n_classes \
+    -Re_size $Re_size \
+    -baffle_size $baffle_size \
     -k_p $k_p
 
 }

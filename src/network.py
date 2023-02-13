@@ -22,7 +22,9 @@ class AgeNet(nn.Module):
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
         self.in_dims = in_dims
-        self.bottom_conv = bigConv(args.lat_dim+2, args.lat_dim, self.conv_act, 0, False)
+        self.Re_size = args.Re_size
+        self.baffle_size = args.baffle_size
+        self.bottom_conv = bigConv(args.lat_dim+self.Re_size+self.baffle_size, args.lat_dim, self.conv_act, 0, False)
         self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, False)
         self.Re_mat = Re_mat
         self.num_features = args.num_features
@@ -69,9 +71,12 @@ class AgeNet(nn.Module):
             x, edge_index, indc = self.pools[i](x, edge_index)
             indcs.append(indc)
         Re_mat = np.repeat(input.Re[0].item(), x.shape[0])
-        Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], 1))
+        Re_mat = np.repeat(Re_mat, self.Re_size)
+        Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], self.Re_size))
+        print(Re_mat.shape)
         baffle_mat = np.repeat(input.bafflesze[0].item(), x.shape[0])
-        baffle_mat = torch.reshape(torch.Tensor(baffle_mat), (x.shape[0], 1))
+        baffle_mat = np.repeat(baffle_mat, self.baffle_size)
+        baffle_mat = torch.reshape(torch.Tensor(baffle_mat), (x.shape[0], self.baffle_size))
         Re_mat = Re_mat.to(self.device)
         baffle_mat = baffle_mat.to(self.device)
         x = torch.cat((x, Re_mat, baffle_mat), 1)
