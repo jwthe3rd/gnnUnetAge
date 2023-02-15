@@ -1,7 +1,7 @@
 batch_size=4
 data_path="./data/"
 num_epochs=200
-device="cuda"
+device="cpu"
 lr=0.0005
 max_v=1.0
 max_L=0.001
