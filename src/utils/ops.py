@@ -11,7 +11,8 @@ class bigConv(nn.Module):
     def __init__(self, in_dim, out_dim, act, p, batchNorm):
 
         super(bigConv, self).__init__()
-        self.conv = SAGEConv(in_dim, out_dim)
+        self.conv1 = SAGEConv(in_dim, out_dim)
+        self.conv2 = SAGEConv(out_dim, out_dim)
         self.act = act
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
         self.batchNorm = BatchNorm(in_dim) if batchNorm else nn.Identity()
@@ -20,7 +21,9 @@ class bigConv(nn.Module):
         edge_index = add_self_loops(edge_index)[0]
 
         l1 = self.batchNorm(x)
-        l1 = self.conv(x, edge_index)
+        l1 = self.conv1(x, edge_index)
+        l1 = self.act(l1)
+        l1 = self.conv2(l1, edge_index)
         l1 = self.drop(l1)
         l1 = self.act(l1)
 
@@ -32,7 +35,7 @@ class graphConvPool(nn.Module):
     def __init__(self, k, in_dim, act):
         super(graphConvPool, self).__init__()
         self.k = k
-        self.scoregen = nn.Linear(in_dim, 1)
+        self.scoregen = GCNConv(in_dim, 1)
         self.act = act
 
     def remove_obstacle(self,max, shape, indices):
@@ -65,7 +68,7 @@ class graphConvPool(nn.Module):
         return new_g, e1, indices
         
     def forward(self, x, edge_index):
-        p1 = self.scoregen(x)
+        p1 = self.scoregen(x, edge_index)
         return self.top_k_pool(x, edge_index, p1)
 
 class graphConvUnpool(nn.Module):

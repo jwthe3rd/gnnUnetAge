@@ -21,7 +21,7 @@ def gen_edge(datafile):
     tot_dist = x_dist + y_dist
     dist = torch.sqrt(tot_dist)
 
-    init_mat = torch.where(dist<0.05, dist, 0.)
+    init_mat = torch.where(dist<0.07, dist, 0.)
     new_mat = torch.where(init_mat==0, init_mat, 1.)
 
     adj_mat = new_mat + torch.eye(new_mat.shape[0])
@@ -36,22 +36,17 @@ def gen_edge(datafile):
 
     edges = adj_mat.nonzero().t().contiguous()
 
-    print(edges)
-
     return edges
 
 
 if __name__=="__main__":
-    print(1)
      
     data_dir = 'data/baffle5/'
 
     for f in os.scandir(data_dir):
-        print(1)
 
         if f.is_file() and f.name[0] == 'f':
 
-            print(1)
 
             edges = gen_edge(datafile=f.path)
 

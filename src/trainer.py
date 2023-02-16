@@ -95,7 +95,7 @@ class Trainer:
             self.training_acc.append(train_accur/len(self.train_loader))
             self.validation_acc.append(val_accur/len(self.val_loader))
 
-            torch.save(self.model.state_dict(), 'models/model1')
+            torch.save(self.model.state_dict(), 'models/model2')
 
         fig = plt.figure()
         plt.plot(epoch_plot,self.training_loss, label="training nll loss")
