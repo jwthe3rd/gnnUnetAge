@@ -143,7 +143,7 @@ def run_test(model, data):
 if __name__ == "__main__":
     args = get_args()
     model = AgeNet(8, args, None, torch.tanh, torch.tanh, None)
-    model.load_state_dict(torch.load('../models/model1'))
+    model.load_state_dict(torch.load('../models/model2'))
     model.to("cuda")
 
     for test in args.test:
