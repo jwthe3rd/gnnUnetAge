@@ -41,7 +41,7 @@ def gen_edge(datafile):
 
 if __name__=="__main__":
      
-    data_dir = 'data/baffle5/'
+    data_dir = 'data/baffle6/'
 
     for f in os.scandir(data_dir):
 

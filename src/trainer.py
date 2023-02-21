@@ -25,7 +25,7 @@ class Trainer:
         training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
         validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
 
-        print(e[int(len(e)*0.8):])
+        print(len(e[int(len(e)*0.8):]))
 
         self.train_loader = DataLoader(training_dataset, batch_size=self.batch_size)
         self.val_loader = DataLoader(validation_dataset, batch_size=self.batch_size)
