@@ -22,6 +22,9 @@ def get_args():
     parser.add_argument('-max_L', type=float, default=0.01, help='max_L')
     parser.add_argument('-data_path', type=str, default='../data/', help='data_path')
     parser.add_argument('-device', type=str, default='cpu', help='device')
+    parser.add_argument('-batch_norm', type=bool, default=False, help='batch_norm')
+    parser.add_argument('-down_dropout', type=float, nargs='+',default=[0.7], help='down_dropout')
+    parser.add_argument('-up_dropout', type=float, nargs='+',default=[0.7], help='up_dropout')
     parser.add_argument('-up_conv_dims', type=int, nargs='+',default=[200, 100, 50, 10], help='up_conv_dims')
     parser.add_argument('-down_conv_dims', type=int, nargs='+',default=[10, 50, 100, 200], help='down_conv_dims')
 

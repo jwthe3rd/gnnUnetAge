@@ -20,12 +20,13 @@ class bigConv(nn.Module):
     def forward(self, x, edge_index):
         edge_index = add_self_loops(edge_index)[0]
 
-        l1 = self.batchNorm(x)
         l1 = self.conv1(x, edge_index)
         l1 = self.act(l1)
+        l1 = self.batchNorm(l1)
         l1 = self.conv2(l1, edge_index)
         l1 = self.drop(l1)
         l1 = self.act(l1)
+        l1 = self.batchNorm(l1)
 
         return l1
 

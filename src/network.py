@@ -16,6 +16,9 @@ class AgeNet(nn.Module):
         self.unpools = nn.ModuleList()
         self.conv_act = conv_act
         self.pool_act = pool_act
+        self.batch_norm = args.batch_norm
+        self.down_drop = args.down_drop
+        self.up_drop = args.up_drop
         #self.up_conv_dims = [int(j) for j in args.up_conv_dims.split()]
         #self.down_conv_dims = [int(j) for j in args.down_conv_dims.split()]
         self.up_conv_dims = args.up_conv_dims
@@ -24,8 +27,8 @@ class AgeNet(nn.Module):
         self.in_dims = in_dims
         self.Re_size = args.Re_size
         self.baffle_size = args.baffle_size
-        self.bottom_conv = bigConv(args.lat_dim+self.Re_size+self.baffle_size, args.lat_dim, self.conv_act, 0, False)
-        self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, False)
+        self.bottom_conv = bigConv(args.lat_dim+self.Re_size+self.baffle_size, args.lat_dim, self.conv_act, 0, self.batch_norm)
+        self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
         self.Re_mat = Re_mat
         self.num_features = args.num_features
         self.lat_dim = args.lat_dim
@@ -36,21 +39,21 @@ class AgeNet(nn.Module):
 
         for i, dim in enumerate(self.down_conv_dims):
             if i == 0:
-                self.down_convs.append(bigConv(self.num_features, dim, self.conv_act, 0.2, False ))
+                self.down_convs.append(bigConv(self.num_features, dim, self.conv_act, self.down_drop[0], self.batch_norm))
                 self.pools.append(graphConvPool(self.k_p, dim, self.pool_act))
             else:
-                self.down_convs.append(bigConv(self.down_conv_dims[i-1], dim, self.conv_act, 0.2, False ))
+                self.down_convs.append(bigConv(self.down_conv_dims[i-1], dim, self.conv_act, self.down_drop[i-1], self.batch_norm ))
                 self.pools.append(graphConvPool(self.k_p, dim, self.pool_act))
 
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
-                self.up_convs.append(bigConv(2*self.lat_dim, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(2*self.lat_dim, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
             elif i == self.depth-1:
                 self.up_convs.append(bigConv(dim*2, self.n_classes, self.conv_act, 0.0, False)) 
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device)) 
             else:
-                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, 0.2, False ))
+                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
 
         Initializer.weights_init(self) 
