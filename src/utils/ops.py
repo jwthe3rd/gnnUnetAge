@@ -15,7 +15,8 @@ class bigConv(nn.Module):
         self.conv2 = SAGEConv(out_dim, out_dim)
         self.act = act
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
-        self.batchNorm = BatchNorm(in_dim) if batchNorm else nn.Identity()
+        self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
+        self.batchNorm2 = BatchNorm(out_dim) if batchNorm else nn.Identity()
 
     def forward(self, x, edge_index):
         edge_index = add_self_loops(edge_index)[0]
@@ -26,7 +27,7 @@ class bigConv(nn.Module):
         l1 = self.conv2(l1, edge_index)
         l1 = self.drop(l1)
         l1 = self.act(l1)
-        l1 = self.batchNorm(l1)
+        l1 = self.batchNorm2(l1)
 
         return l1
 
