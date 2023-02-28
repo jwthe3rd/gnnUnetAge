@@ -1,7 +1,7 @@
+from network import AgeNet
 import numpy as np
 import os
 import argparse
-from src.network import AgeNet
 from torch_geometric.data import Data
 import torch
 import torch.nn.functional as F
@@ -28,10 +28,7 @@ def get_args():
     parser.add_argument('-up_drop', type=float, nargs='+',default=[0.7], help='up_drop')
     parser.add_argument('-up_conv_dims', type=int, nargs='+',default=[200, 100, 50, 10], help='up_conv_dims')
     parser.add_argument('-down_conv_dims', type=int, nargs='+',default=[10, 50, 100, 200], help='down_conv_dims')
-
-    args, _ = parser.parse_known_args()
-
-    return args
+    parser.add_argument('-test', type=str, nargs='+', default='', help='test')
 
     args, _ = parser.parse_known_args()
 
@@ -70,7 +67,6 @@ def pred_to_contour(pred, data, max_iter):
             labels_mat.append(0)
         else:
             labels_mat.append(vals[value])
-
 
 
     with open(f'tests/{data}/{max_iter}age') as f:
@@ -156,6 +152,3 @@ if __name__ == "__main__":
         test_acc, test_loss, test_preds = run_test(model, data=test)
         max_iter = find_max_iter(test)
         pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
-
-
-
