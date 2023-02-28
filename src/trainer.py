@@ -43,7 +43,7 @@ class Trainer:
         loss = F.nll_loss(out, batch.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == batch.y).float())
-        loss += torch.mean(((preds - batch.y)/1.01)**2)
+        # loss += torch.mean(((preds - batch.y)/1.01)**2)
         loss.backward()
         optimizer.step()
         train_loss += loss.item()

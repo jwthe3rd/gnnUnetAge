@@ -1,7 +1,7 @@
 batch_size=3
 data_path="./data/"
 num_epochs=20
-device="cpu"
+device="cuda"
 lr=0.001
 max_v=1.0
 max_L=0.001
@@ -16,5 +16,6 @@ Re_size=20
 baffle_size=20
 dbl_size=20
 seed=27
-n_classes=4
+n_classes=15
 k_p=0.7
+test="0_7Re10_1 0_7Re10_5"

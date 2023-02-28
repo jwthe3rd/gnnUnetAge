@@ -49,24 +49,35 @@ def find_max_iter(dir):
     return f'{max(numbers)}/'
 
 def pred_to_contour(pred, data, max_iter):
-    vals = np.linspace(0, 1, 11)
+    # vals = np.linspace(0, 1, 11)
     labels_mat = []
-    for i, val in enumerate(vals):
-        vals[i] = round(val, 1)
+    # for i, val in enumerate(vals):
+    #     vals[i] = round(val, 1)
+
+    # for value in pred:
+    #     if value == len(vals):
+    #         labels_mat.append(1.1)
+    #     elif value == len(vals) + 1:
+    #         labels_mat.append(2.1)
+    #     elif value == len(vals) + 2:
+    #         labels_mat.append(5.1)
+    #     elif value == len(vals) + 3:
+    #         labels_mat.append(10.1)
+    #     elif value == 0:
+    #         labels_mat.append(0)
+    #     else:
+    #         labels_mat.append(vals[value])
 
     for value in pred:
-        if value == len(vals):
-            labels_mat.append(1.1)
-        elif value == len(vals) + 1:
-            labels_mat.append(2.1)
-        elif value == len(vals) + 2:
-            labels_mat.append(5.1)
-        elif value == len(vals) + 3:
-            labels_mat.append(10.1)
-        elif value == 0:
+        if value == 0:
             labels_mat.append(0)
+        elif value == 1:
+            labels_mat.append(22.5)
+        elif value == 2:
+            labels_mat.append(45)
         else:
-            labels_mat.append(vals[value])
+            labels_mat.append(90)
+
 
 
     with open(f'tests/{data}/{max_iter}age') as f:
@@ -127,7 +138,7 @@ def run_test(model, data):
     Re_num = torch.tensor([int(data[8])])
 
     print(Re_num)
-    print(f'baffle siuze is {bafflesze}')
+    print(f'baffle size is {bafflesze}')
 
     datapt = Data(x=x, edge_index=e, y=y, Re=Re_num, bafflesze=bafflesze)
     datapt.to("cuda")
