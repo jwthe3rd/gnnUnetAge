@@ -60,9 +60,26 @@ class gnnAgeDataSet(Dataset):
         edge_index = torch.load(self.edge_paths[idx])
         Y = torch.load(self.label_paths[idx])
 
-        Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
-        bafflesze = int(self.feats_paths[idx][len(self.feats_paths[idx])-10])
+        curr_path = self.feats_paths[idx]
 
-        data = Data(x=X, edge_index = edge_index, y=Y, Re=Re_num, bafflesze=bafflesze)
+        if curr_path.split('_')[1][0] == 'd':
+            double = 1
+            bafflesze = int(curr_path.split('_')[3])
+        else:
+            double = 0
+            bafflesze = int((curr_path.split('_')[2]))
+
+
+        split_check = curr_path.split('-')
+
+        if len(split_check) == 2:
+            Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+        else:
+            Re_num = 2
+
+        # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+        # bafflesze = int(self.feats_paths[idx][])
+
+        data = Data(x=X, edge_index = edge_index, y=Y, Re=Re_num, bafflesze=bafflesze,  dbl=double)
 
         return data 

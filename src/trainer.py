@@ -43,6 +43,7 @@ class Trainer:
         loss = F.nll_loss(out, batch.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == batch.y).float())
+        loss += torch.mean(((preds - batch.y)/1.01)**2)
         loss.backward()
         optimizer.step()
         train_loss += loss.item()
@@ -63,7 +64,7 @@ class Trainer:
         acc = torch.mean((preds == batch.y).float())
         val_loss += loss.item()
         accur += acc.item()
-        #print ("\033[A                             \033[A")
+        print ("\033[A                             \033[A")
         print(f"Epoch: {epoch}   {int(100*batch_num/len(loader))} % ||| Validation Negative Log-Likelihood Loss = {round(val_loss / (batch_num+1),2)}    ||| Validation Accuracy = {100*round(accur / (batch_num+1),2)} %                ")
         return val_loss, accur
 
@@ -86,6 +87,7 @@ class Trainer:
             for i,batch in enumerate(self.train_loader):
                 batch = batch.to(self.device)
                 train_loss, train_accur, best_loss, best_acc = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur, epoch=epoch, best_loss=best_loss, best_acc=best_acc)
+            print('\n')
             for i,batch in enumerate(self.val_loader):
                 batch = batch.to(self.device)
                 val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur, epoch=epoch)

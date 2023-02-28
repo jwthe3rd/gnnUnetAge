@@ -17,6 +17,7 @@ def get_args():
     parser.add_argument('-lat_dim', type=int, default=5, help='lat_dim')
     parser.add_argument('-Re_size', type=int, default=5, help='Re_size')
     parser.add_argument('-baffle_size', type=int, default=5, help='baffle_size')
+    parser.add_argument('-dbl_size', type=int, default=5, help='dbl_size')
     parser.add_argument('-lr', type=float, default=0.01, help='lr')
     parser.add_argument('-max_v', type=float, default=1.00, help='max_v')
     parser.add_argument('-max_L', type=float, default=0.01, help='max_L')

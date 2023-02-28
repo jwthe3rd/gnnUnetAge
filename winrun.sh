@@ -21,6 +21,7 @@ run() {
     -n_classes $n_classes \
     -Re_size $Re_size \
     -baffle_size $baffle_size \
+    -dbl_size $dbl_size \
     -k_p $k_p \
     -batch_norm $batch_norm \
     -down_drop $down_drop \
