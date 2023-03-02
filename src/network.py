@@ -7,9 +7,8 @@ from utils.ops import bigConv, graphConvPool, graphConvUnpool, Initializer
 
 class AgeNet(nn.Module):
 
-    def __init__(self, in_dims, args,ks, conv_act, pool_act, Re_mat):
+    def __init__(self, args,conv_act, pool_act):
         super(AgeNet, self).__init__()
-        self.ks = ks
         self.down_convs = nn.ModuleList()
         self.up_convs = nn.ModuleList()
         self.pools = nn.ModuleList()
@@ -24,13 +23,11 @@ class AgeNet(nn.Module):
         self.up_conv_dims = args.up_conv_dims
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
-        self.in_dims = in_dims
         self.Re_size = args.Re_size
         self.baffle_size = args.baffle_size
         self.dbl_size = args.dbl_size
         self.bottom_conv = bigConv(args.lat_dim+self.Re_size+self.baffle_size+self.dbl_size, args.lat_dim, self.conv_act, 0, self.batch_norm)
         self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
-        self.Re_mat = Re_mat
         self.num_features = args.num_features
         self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes

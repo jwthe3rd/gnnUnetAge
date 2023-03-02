@@ -24,10 +24,11 @@ class bigConv(nn.Module):
         l1 = self.conv1(x, edge_index)
         l1 = self.act(l1)
         l1 = self.batchNorm(l1)
-        l1 = self.conv2(l1, edge_index)
         l1 = self.drop(l1)
-        l1 = self.act(l1)
-        l1 = self.batchNorm2(l1)
+        # l1 = self.conv2(l1, edge_index)
+        # l1 = self.drop(l1)
+        # l1 = self.act(l1)
+        # l1 = self.batchNorm2(l1)
 
         return l1
 
@@ -71,6 +72,7 @@ class graphConvPool(nn.Module):
         
     def forward(self, x, edge_index):
         p1 = self.scoregen(x, edge_index)
+        p1 = self.act(p1)
         return self.top_k_pool(x, edge_index, p1)
 
 class graphConvUnpool(nn.Module):

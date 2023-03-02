@@ -75,8 +75,9 @@ class Trainer:
         self.validation_loss =[]
         self.training_acc = []
         self.validation_acc = []
-        epoch_plot = np.linspace(0,self.num_epochs,self.num_epochs)
+        epoch_plot = [] #np.linspace(0,self.num_epochs,self.num_epochs)
         for epoch in range(self.num_epochs):
+            epoch_plot.append(epoch)
             print('\n')
             train_loss = 0
             val_loss = 0
@@ -99,18 +100,18 @@ class Trainer:
 
             torch.save(self.model.state_dict(), 'models/model2')
 
-        fig = plt.figure()
-        plt.plot(epoch_plot,self.training_loss, label="training nll loss")
-        plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
-        plt.legend()
-        plt.savefig('./figs/loss_plot.png')
+            fig = plt.figure()
+            plt.plot(epoch_plot,self.training_loss, label="training nll loss")
+            plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
+            plt.legend()
+            plt.savefig('./figs/loss_plot.png')
 
-        fig = plt.figure()
+            fig = plt.figure()
 
-        plt.plot(epoch_plot,self.training_acc, label="training accuracy")
-        plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
-        plt.legend()
-        plt.savefig('./figs/accuracy_plot.png')
+            plt.plot(epoch_plot,self.training_acc, label="training accuracy")
+            plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
+            plt.legend()
+            plt.savefig('./figs/accuracy_plot.png')
 
 
 

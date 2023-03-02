@@ -41,7 +41,7 @@ if __name__=="__main__":
 
     options = vars(args)
 
-    model = AgeNet(6, args, [0.7, 0.7, 0.7], torch.tanh, torch.tanh, torch.Tensor([1,1]))
+    model = AgeNet(args, conv_act=torch.tanh, pool_act=torch.tanh)
 
     trainer = Trainer(args,model, torch.optim.Adam)
     trainer.train()
