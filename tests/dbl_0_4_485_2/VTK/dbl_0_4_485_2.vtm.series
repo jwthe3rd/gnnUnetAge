@@ -1,0 +1,7 @@
+{
+  "file-series-version" : "1.0",
+  "files" : [
+    { "name" : "dbl_0_4_485_2_0.vtm", "time" : 0 },
+    { "name" : "dbl_0_4_485_2_487.vtm", "time" : 487 }
+  ]
+}

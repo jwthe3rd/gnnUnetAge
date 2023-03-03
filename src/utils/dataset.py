@@ -44,12 +44,13 @@ class data_generator:
 
 class gnnAgeDataSet(Dataset):
 
-    def __init__(self, edge_paths, feats_paths, label_paths, transform=None):
+    def __init__(self, edge_paths, feats_paths, label_paths, transform=None, test=False):
 
         self.edge_paths = edge_paths
         self.feats_paths = feats_paths
         self.label_paths = label_paths
         self.transform = transform
+        self.test=test
 
     def __len__(self):
         return len(self.feats_paths)
@@ -60,22 +61,61 @@ class gnnAgeDataSet(Dataset):
         edge_index = torch.load(self.edge_paths[idx])
         Y = torch.load(self.label_paths[idx])
 
-        curr_path = self.feats_paths[idx]
+        if self.test:
+            curr_path = self.feats_paths[idx]
 
-        if curr_path.split('_')[1][0] == 'd':
-            double = 1
-            bafflesze = int(curr_path.split('_')[3])
+            if curr_path.split('_')[5][0] == 'd':
+                # print(curr_path.split('_'))
+                # print(curr_path.split('-'))
+                double = 1
+                if len(curr_path.split('_')[7]) == 2:
+                    bafflesze = int(curr_path.split('_')[7])
+                else:
+                    bafflesze = int(curr_path.split('_')[7])*10
+            else:
+                double = 0
+                bafflesze = int((curr_path.split('_')[1]))
+                if len(curr_path.split('_')[1]) == 2:
+                    bafflesze = int(curr_path.split('_')[1])
+                else:
+                    bafflesze = int(curr_path.split('_')[1])*10
+
+
+            split_check = curr_path.split('-')
+
+            if len(split_check) == 3:
+                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+            else:
+                Re_num = 2
+
+            print(f'Re is: {Re_num}')
+            print(f'Baffle Size is : {bafflesze}')
+            print(f'Double is : {double}')
         else:
-            double = 0
-            bafflesze = int((curr_path.split('_')[2]))
+            curr_path = self.feats_paths[idx]
+
+            if curr_path.split('_')[1][0] == 'd':
+                double = 1
+                if len(curr_path.split('_')[3]) == 2:
+                    bafflesze = int(curr_path.split('_')[3])
+                else:
+                    bafflesze = int(curr_path.split('_')[3])*10
+                #bafflesze = int(curr_path.split('_')[3])
+            else:
+                double = 0
+                if len(curr_path.split('_')[2]) == 2:
+                    bafflesze = int(curr_path.split('_')[2])
+                else:
+                    bafflesze = int(curr_path.split('_')[2])*10
+                # bafflesze = int((curr_path.split('_')[2]))
 
 
-        split_check = curr_path.split('-')
+            split_check = curr_path.split('-')
 
-        if len(split_check) == 2:
-            Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
-        else:
-            Re_num = 2
+            if len(split_check) == 2:
+                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+            else:
+                Re_num = 2
 
         # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
         # bafflesze = int(self.feats_paths[idx][])
