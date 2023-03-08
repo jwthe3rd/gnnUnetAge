@@ -173,18 +173,21 @@ def run_test(model, data):
         loss = F.nll_loss(out, data_test.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == data_test.y).float())
-        acc += acc.item()
-        loss = loss.item()
+        #acc += acc.item()
+        #loss = loss.item()
     #print ("\033[A                             \033[A")
-    return acc, loss, preds
+    return acc.item(), loss.item(), preds
 
 if __name__ == "__main__":
     args = get_args()
     model = AgeNet(args, torch.tanh, torch.tanh)
-    model.load_state_dict(torch.load('models/model3'))
+    model.load_state_dict(torch.load('models/model4'))
     model.to("cuda")
+    model.eval()
 
     for test in args.test:
         test_acc, test_loss, test_preds = run_test(model, data=test)
         max_iter = find_max_iter(test)
-        pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        #pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        print(f'Loss is {test_loss}')
+        print(f'Acc is {test_acc}')

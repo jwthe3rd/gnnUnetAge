@@ -14,6 +14,8 @@ def add_dist_baffle(filename):
 
     feat_mat = torch.load(filename).T
 
+    feat_mat = feat_mat[0:8]
+
     xc, yc = feat_mat[6], feat_mat[7]
     baffle_indcs = torch.nonzero(feat_mat[3], as_tuple=True)
     xc_baf, yc_baf = xc[baffle_indcs], yc[baffle_indcs]
@@ -28,7 +30,7 @@ def add_dist_baffle(filename):
 
     feat_mat = torch.cat((feat_mat,d_baf),-1)
 
-    torch.save(feat_mat,f'../baffle8/{filename}')
+    torch.save(feat_mat,f'./{filename}')
 
     return 0
 

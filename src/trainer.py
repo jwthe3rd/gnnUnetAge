@@ -25,8 +25,8 @@ class Trainer:
         training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
         validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
 
-        print(len(e[int(len(e)*0.8):]))
-
+        print((e[int(len(e)*0.8):]))
+        raise KeyError
         self.train_loader = DataLoader(training_dataset, batch_size=self.batch_size)
         self.val_loader = DataLoader(validation_dataset, batch_size=self.batch_size)
 
@@ -98,7 +98,7 @@ class Trainer:
             self.training_acc.append(train_accur/len(self.train_loader))
             self.validation_acc.append(val_accur/len(self.val_loader))
 
-            torch.save(self.model.state_dict(), 'models/model3')
+            torch.save(self.model.state_dict(), 'models/model4')
 
             fig = plt.figure()
             plt.plot(epoch_plot,self.training_loss, label="training nll loss")
