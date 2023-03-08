@@ -4,6 +4,8 @@ from torch.utils.data import Dataset
 from torch_geometric.data import Data
 import torch
 import random
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 class data_generator:
 
@@ -13,34 +15,36 @@ class data_generator:
 
     def segment_data(self):
         training_cases = os.listdir(self.path)
-        train_data = []
-        edge_paths = []
-        feats_paths = []
-        label_paths = []
+        edge_train = []
+        feats_train = []
+        label_train = []
+        edge_val = []
+        feats_val = []
+        label_val = []
         unique_cases = []
+        Re_list = []
         ## Adding paths for all training data
         for data_file in training_cases:
             if data_file[2:] not in unique_cases:
                 unique_cases.append(data_file[2:])
 
-        random.seed(self.seed)
-        random.shuffle(unique_cases)
+        for case in unique_cases:
+            Re_list.append(1 if len(case.split('-'))==2 else 0)
 
-        for cases in unique_cases:
-            edge_paths.append(f'{self.path}e_{cases}')
-            feats_paths.append(f'{self.path}f_{cases}')
-            label_paths.append(f'{self.path}l_{cases}')
-            
-
+        # comb_list = np.asarray([unique_cases, Re_list])
+        # comb_list = comb_list.reshape(len(unique_cases), 2)
+        print(Re_list)
+        train_cases, val_cases, *_ = train_test_split(unique_cases, train_size=0.8, random_state=self.seed, stratify=Re_list)
+        for case in train_cases:
+            edge_train.append(f'{self.path}e_{case}')
+            feats_train.append(f'{self.path}f_{case}')
+            label_train.append(f'{self.path}l_{case}')
+        for case in val_cases:
+            edge_val.append(f'{self.path}e_{case}')
+            feats_val.append(f'{self.path}f_{case}')
+            label_val.append(f'{self.path}l_{case}')
         
-            # if data_file[0] == 'e':
-            #     edge_paths.append(self.path + data_file)
-            # elif data_file[0] == 'f':
-            #     feats_paths.append(self.path + data_file)
-            # elif data_file[0] == 'l':
-            #     label_paths.append(self.path + data_file)
-        
-        return label_paths, feats_paths, edge_paths
+        return label_train, feats_train, edge_train,label_val, feats_val, edge_val
 
 class gnnAgeDataSet(Dataset):
 

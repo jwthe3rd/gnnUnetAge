@@ -6,6 +6,7 @@ from torch_geometric.loader import DataLoader
 import torch.nn.functional as F
 
 
+
 class Trainer:
 
     def __init__(self, args, model, optimizer):
@@ -21,11 +22,10 @@ class Trainer:
 
     def load_data(self):
 
-        y, x, e = data_generator(path=self.path, seed=self.seed).segment_data()
-        training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
-        validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
+        y_train, x_train, e_train, y_val, x_val, e_val = data_generator(path=self.path, seed=self.seed).segment_data()
+        # training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
+        # validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
 
-        print((e[int(len(e)*0.8):]))
         raise KeyError
         self.train_loader = DataLoader(training_dataset, batch_size=self.batch_size)
         self.val_loader = DataLoader(validation_dataset, batch_size=self.batch_size)
