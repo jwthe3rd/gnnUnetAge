@@ -31,7 +31,21 @@ class bigConv(nn.Module):
         # l1 = self.batchNorm2(l1)
 
         return l1
+    
+class feedFWD(nn.Module):
 
+    def __init__(self, in_dim, out_dim, act, p, batchNorm=False):
+        super(FFWD, self).__init__()
+        self.lin = nn.Linear(in_dim, out_dim, bias=False)
+        self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
+        self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
+        self.act = act
+
+    def forward(self, x):
+        x = self.lin(x)
+        x = self.batchNorm(x)
+        x = self.drop(x)
+        return self.act(x)
 
 class graphConvPool(nn.Module):
 

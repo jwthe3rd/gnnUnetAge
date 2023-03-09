@@ -4,6 +4,7 @@ import argparse
 from trainer import Trainer
 from network import AgeNet
 import torch
+import torch.nn.functional as F
 
 def get_args():
 
@@ -42,7 +43,7 @@ if __name__=="__main__":
 
     options = vars(args)
 
-    model = AgeNet(args, conv_act=torch.tanh, pool_act=torch.tanh)
+    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu)
 
     trainer = Trainer(args,model, torch.optim.Adam)
     trainer.train()
