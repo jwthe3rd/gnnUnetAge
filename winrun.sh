@@ -13,6 +13,7 @@ run() {
     -lr $lr \
     -max_v $max_v \
     -max_L $max_L \
+    -early_stop $early_stop \
     -up_conv_dims $up_conv_dims \
     -down_conv_dims $down_conv_dims \
     -lat_dim $lat_dim \

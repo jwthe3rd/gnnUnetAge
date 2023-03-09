@@ -33,7 +33,8 @@ class data_generator:
 
         # comb_list = np.asarray([unique_cases, Re_list])
         # comb_list = comb_list.reshape(len(unique_cases), 2)
-        print(Re_list)
+        # print(Re_list[0:10])
+        # print(unique_cases[0:10])
         train_cases, val_cases, *_ = train_test_split(unique_cases, train_size=0.8, random_state=self.seed, stratify=Re_list)
         for case in train_cases:
             edge_train.append(f'{self.path}e_{case}')
@@ -43,6 +44,18 @@ class data_generator:
             edge_val.append(f'{self.path}e_{case}')
             feats_val.append(f'{self.path}f_{case}')
             label_val.append(f'{self.path}l_{case}')
+        Re_list = []
+        for case in edge_train:
+            Re_list.append(1 if len(case.split('-'))==2 else 0)
+
+        # print(len(edge_train))
+        # print(len(edge_val))
+        # print(sum(Re_list) / len(Re_list))
+        if len(edge_train) != len(feats_train) or len(edge_train) != len(label_train):
+            raise ValueError('mismatch in edges, labels and feats train size')
+        if len(edge_val) != len(feats_val) or len(edge_val) != len(label_val):
+            raise ValueError('mismatch in edges, labels and feats val size')
+        
         
         return label_train, feats_train, edge_train,label_val, feats_val, edge_val
 
@@ -88,9 +101,9 @@ class gnnAgeDataSet(Dataset):
             split_check = curr_path.split('-')
 
             if len(split_check) == 3:
-                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = 1#Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
             else:
-                Re_num = 2
+                Re_num = 0#Re_num = 2
 
             print(f'Re is: {Re_num}')
             print(f'Baffle Size is : {bafflesze}')
@@ -117,9 +130,9 @@ class gnnAgeDataSet(Dataset):
             split_check = curr_path.split('-')
 
             if len(split_check) == 2:
-                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = 1#Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
             else:
-                Re_num = 2
+                Re_num= 0#Re_num = 2
 
         # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
         # bafflesze = int(self.feats_paths[idx][])

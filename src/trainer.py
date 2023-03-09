@@ -19,14 +19,14 @@ class Trainer:
         self.seed = args.seed
         self.optimizer = optimizer
         self.lr = args.lr
+        self.early_stop = args.early_stop
 
     def load_data(self):
 
         y_train, x_train, e_train, y_val, x_val, e_val = data_generator(path=self.path, seed=self.seed).segment_data()
-        # training_dataset = gnnAgeDataSet(e[0:int(len(e)*0.8)], x[0:int(len(x)*0.8)], y[0:int(len(y)*0.8)])
-        # validation_dataset = gnnAgeDataSet(e[int(len(e)*0.8):], x[int(len(x)*0.8):], y[int(len(y)*0.8):])
+        training_dataset = gnnAgeDataSet(e_train, x_train, y_train)
+        validation_dataset = gnnAgeDataSet(e_val, x_val, y_val)
 
-        raise KeyError
         self.train_loader = DataLoader(training_dataset, batch_size=self.batch_size)
         self.val_loader = DataLoader(validation_dataset, batch_size=self.batch_size)
 
@@ -76,6 +76,7 @@ class Trainer:
         self.training_acc = []
         self.validation_acc = []
         epoch_plot = [] #np.linspace(0,self.num_epochs,self.num_epochs)
+        count = 0
         for epoch in range(self.num_epochs):
             epoch_plot.append(epoch)
             print('\n')
@@ -83,6 +84,7 @@ class Trainer:
             val_loss = 0
             train_accur = 0
             val_accur = 0
+            prev_val_loss = 0
             best_loss = float('inf')
             best_acc = float('-inf')
             for i,batch in enumerate(self.train_loader):
@@ -92,26 +94,35 @@ class Trainer:
             for i,batch in enumerate(self.val_loader):
                 batch = batch.to(self.device)
                 val_loss, val_accur = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, accur=val_accur, epoch=epoch)
+            if val_loss >= prev_val_loss:
+                count+=1
+                prev_val_loss = val_loss
+            else:
+                count = 0
+                prev_val_loss = val_loss
 
             self.training_loss.append(train_loss/len(self.train_loader))
             self.validation_loss.append(val_loss/len(self.val_loader))
             self.training_acc.append(train_accur/len(self.train_loader))
             self.validation_acc.append(val_accur/len(self.val_loader))
 
-            torch.save(self.model.state_dict(), 'models/model4')
+            if count >= self.early_stop:
+                break
 
-            fig = plt.figure()
-            plt.plot(epoch_plot,self.training_loss, label="training nll loss")
-            plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
-            plt.legend()
-            plt.savefig('./figs/loss_plot.png')
+        torch.save(self.model.state_dict(), 'models/model5_strat')
 
-            fig = plt.figure()
+        fig = plt.figure()
+        plt.plot(epoch_plot,self.training_loss, label="training nll loss")
+        plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
+        plt.legend()
+        plt.savefig('./figs/loss_plot.png')
 
-            plt.plot(epoch_plot,self.training_acc, label="training accuracy")
-            plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
-            plt.legend()
-            plt.savefig('./figs/accuracy_plot.png')
+        fig = plt.figure()
+
+        plt.plot(epoch_plot,self.training_acc, label="training accuracy")
+        plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
+        plt.legend()
+        plt.savefig('./figs/accuracy_plot.png')
 
 
 

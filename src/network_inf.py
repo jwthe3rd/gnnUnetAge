@@ -19,21 +19,21 @@ class AgeNet(nn.Module):
         self.batch_norm = args.batch_norm
         self.down_drop = args.down_drop
         self.up_drop = args.up_drop
-        #self.up_conv_dims = [int(j) for j in args.up_conv_dims.split()]
-        #self.down_conv_dims = [int(j) for j in args.down_conv_dims.split()]
         self.up_conv_dims = args.up_conv_dims
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
         self.Re_size = args.Re_size
         self.baffle_size = args.baffle_size
         self.dbl_size = args.dbl_size
-        self.bottom_conv = bigConv(args.lat_dim+self.Re_size+self.baffle_size+self.dbl_size, args.lat_dim, self.conv_act, 0, self.batch_norm)
+        self.bottom_conv_indim = args.lat_dim+self.Re_size+self.baffle_size+self.dbl_size
+        self.bottom_conv = bigConv(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, 0.2, self.batch_norm)
+        self.bottom_conv2 = bigConv(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)
         self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
         self.num_features = args.num_features
         self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes
         self.k_p = args.k_p
-        self.device = "cuda"
+        self.device = args.device
 
 
         for i, dim in enumerate(self.down_conv_dims):
@@ -46,13 +46,13 @@ class AgeNet(nn.Module):
 
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
-                self.up_convs.append(bigConv(self.lat_dim, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
+                self.up_convs.append(bigConv(self.lat_dim*2, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
             elif i == self.depth-1:
-                self.up_convs.append(bigConv(dim, self.n_classes, self.conv_act, 0.0, False)) 
+                self.up_convs.append(bigConv(dim*2, self.n_classes, self.conv_act, 0.0, False)) 
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device)) 
             else:
-                self.up_convs.append(bigConv(self.up_conv_dims[i], self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
+                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
 
         Initializer.weights_init(self) 
@@ -86,13 +86,14 @@ class AgeNet(nn.Module):
         dbl_mat = dbl_mat.to(self.device)
         x = torch.cat((x, Re_mat, baffle_mat, dbl_mat), 1)
         x = self.bottom_conv(x, edge_index)
+        x = self.bottom_conv2(x, edge_index)
 
         for i in range(self.depth):
 
             up_idx = self.depth - i - 1
             skip, edge, indc = x_skips[up_idx], edge_skips[up_idx], indcs[up_idx]
             x, edge_index = self.unpools[i](skip, edge, indc, x)
-            x = x + skip#torch.cat((x, skip), -1)
+            x = torch.cat((x, skip), -1)
             x = self.up_convs[i](x, edge_index)
 
         return F.log_softmax(x, dim=1)

@@ -11,12 +11,12 @@ class bigConv(nn.Module):
     def __init__(self, in_dim, out_dim, act, p, batchNorm):
 
         super(bigConv, self).__init__()
-        self.conv1 = SAGEConv(in_dim, out_dim)
-        self.conv2 = SAGEConv(out_dim, out_dim)
+        self.conv1 = SAGEConv(in_dim, out_dim, project=True)
+        # self.conv2 = SAGEConv(out_dim, out_dim)
         self.act = act
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
         self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
-        self.batchNorm2 = BatchNorm(out_dim) if batchNorm else nn.Identity()
+        # self.batchNorm2 = BatchNorm(out_dim) if batchNorm else nn.Identity()
 
     def forward(self, x, edge_index):
         edge_index = add_self_loops(edge_index)[0]
