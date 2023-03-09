@@ -8,7 +8,7 @@ from torch_geometric.nn.pool import TopKPooling
 
 class AgeNet(nn.Module):
 
-    def __init__(self, args,conv_act, pool_act):
+    def __init__(self, args,conv_act=F.relu, pool_act=F.relu):
         super(AgeNet, self).__init__()
         self.down_convs = nn.ModuleList()
         self.up_convs = nn.ModuleList()

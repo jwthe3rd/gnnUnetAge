@@ -35,7 +35,7 @@ class bigConv(nn.Module):
 class feedFWD(nn.Module):
 
     def __init__(self, in_dim, out_dim, act, p, batchNorm=False):
-        super(FFWD, self).__init__()
+        super(feedFWD, self).__init__()
         self.lin = nn.Linear(in_dim, out_dim, bias=False)
         self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
@@ -148,8 +148,9 @@ class Initializer(object):
         if isinstance(m, nn.parameter.Parameter):
             cls._glorot_uniform(m.data)
         elif isinstance(m, nn.Linear):
-            m.bias.data.zero_()
-            cls._glorot_uniform(m.weight.data)
+            if m.bias is not None:
+                m.bias.data.zero_()
+                cls._glorot_uniform(m.weight.data)
 
     @classmethod
     def weights_init(cls, m):
