@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.ops import bigConv, graphConvPool, graphConvUnpool, Initializer
+from utils.ops import bigConv, feedFWD, graphConvUnpool, Initializer
 from torch_geometric.nn.pool import TopKPooling
 
 
@@ -26,9 +26,9 @@ class AgeNet(nn.Module):
         self.baffle_size = args.baffle_size
         self.dbl_size = args.dbl_size
         self.bottom_conv_indim = args.lat_dim+self.Re_size+self.baffle_size+self.dbl_size
-        self.bottom_conv = bigConv(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, 0.2, self.batch_norm)
-        self.bottom_conv2 = bigConv(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)
-        self.smooth_conv = bigConv(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
+        self.bottom_lin = feedFWD(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, self.batch_norm)#bigConv(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, 0.2, self.batch_norm)
+        self.bottom_lin2 = feedFWD(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)#bigConv(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)
+        self.classify = feedFWD(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
         self.num_features = args.num_features
         self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes
@@ -85,8 +85,8 @@ class AgeNet(nn.Module):
         baffle_mat = baffle_mat.to(self.device)
         dbl_mat = dbl_mat.to(self.device)
         x = torch.cat((x, Re_mat, baffle_mat, dbl_mat), 1)
-        x = self.bottom_conv(x, edge_index)
-        x = self.bottom_conv2(x, edge_index)
+        x = self.bottom_lin(x)
+        x = self.bottom_lin2(x)
 
         for i in range(self.depth):
 
@@ -95,6 +95,8 @@ class AgeNet(nn.Module):
             x, edge_index = self.unpools[i](skip, edge, indc, x)
             x = torch.cat((x, skip), -1)
             x = self.up_convs[i](x, edge_index)
+        
+        x = self.classify(x)
 
         return F.log_softmax(x, dim=1)
 

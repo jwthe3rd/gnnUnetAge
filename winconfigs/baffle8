@@ -1,11 +1,11 @@
 batch_size=3
 data_path="./data/"
-num_epochs=20
+num_epochs=50
 device="cuda"
 lr=0.001
 max_v=1.0
 max_L=0.001
-early_stop=5
+early_stop=20
 down_conv_dims="64 128 256"
 up_conv_dims="256 128 64"
 lat_dim=256
