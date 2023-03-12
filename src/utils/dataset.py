@@ -25,7 +25,7 @@ class data_generator:
         Re_list = []
         ## Adding paths for all training data
         for data_file in training_cases:
-            if data_file[2:] not in unique_cases:
+            if data_file[0] == 'f' and data_file[2:] not in unique_cases:
                 unique_cases.append(data_file[2:])
 
         for case in unique_cases:
@@ -86,24 +86,24 @@ class gnnAgeDataSet(Dataset):
                 # print(curr_path.split('-'))
                 double = 1
                 if len(curr_path.split('_')[7]) == 2:
-                    bafflesze = int(curr_path.split('_')[7])
+                    bafflesze = int(curr_path.split('_')[7])/10
                 else:
-                    bafflesze = int(curr_path.split('_')[7])*10
+                    bafflesze = int(curr_path.split('_')[7])
             else:
                 double = 0
                 bafflesze = int((curr_path.split('_')[1]))
                 if len(curr_path.split('_')[1]) == 2:
-                    bafflesze = int(curr_path.split('_')[1])
+                    bafflesze = int(curr_path.split('_')[1])/10
                 else:
-                    bafflesze = int(curr_path.split('_')[1])*10
+                    bafflesze = int(curr_path.split('_')[1])
 
 
             split_check = curr_path.split('-')
 
             if len(split_check) == 3:
-                Re_num = 1#Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
             else:
-                Re_num = 0#Re_num = 2
+                Re_num = 0
 
             print(f'Re is: {Re_num}')
             print(f'Baffle Size is : {bafflesze}')
@@ -116,27 +116,33 @@ class gnnAgeDataSet(Dataset):
                 if len(curr_path.split('_')[3]) == 2:
                     bafflesze = int(curr_path.split('_')[3])
                 else:
-                    bafflesze = int(curr_path.split('_')[3])*10
+                    bafflesze = int(curr_path.split('_')[3])/10
                 #bafflesze = int(curr_path.split('_')[3])
             else:
                 double = 0
                 if len(curr_path.split('_')[2]) == 2:
-                    bafflesze = int(curr_path.split('_')[2])
+                    bafflesze = int(curr_path.split('_')[2])/10
                 else:
-                    bafflesze = int(curr_path.split('_')[2])*10
+                    bafflesze = int(curr_path.split('_')[2])
                 # bafflesze = int((curr_path.split('_')[2]))
 
 
             split_check = curr_path.split('-')
 
             if len(split_check) == 2:
-                Re_num = 1#Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
             else:
                 Re_num= 0#Re_num = 2
 
         # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
         # bafflesze = int(self.feats_paths[idx][])
 
-        data = Data(x=X, edge_index = edge_index, y=Y, Re=Re_num, bafflesze=bafflesze,  dbl=double)
+        Re_num = torch.tensor(np.repeat(Re_num, X.shape[0]), dtype=torch.float32).reshape(-1,1)
+        bafflesze = torch.tensor(np.repeat(bafflesze, X.shape[0]), dtype=torch.float32).reshape(-1,1)
+        double = torch.tensor(np.repeat(double, X.shape[0]), dtype=torch.float32).reshape(-1,1)
+
+        X = torch.cat((X, Re_num, bafflesze, double), -1)
+
+        data = Data(x=X, edge_index = edge_index, y=Y, name=curr_path)#, Re=Re_num, bafflesze=bafflesze,  dbl=double)
 
         return data 

@@ -11,7 +11,7 @@ class bigConv(nn.Module):
     def __init__(self, in_dim, out_dim, act, p, batchNorm):
 
         super(bigConv, self).__init__()
-        self.conv1 = SAGEConv(in_dim, out_dim, project=True)
+        self.conv1 = SAGEConv(in_dim, out_dim, project=True, aggr='max')
         # self.conv2 = SAGEConv(out_dim, out_dim)
         self.act = act
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
@@ -45,7 +45,8 @@ class feedFWD(nn.Module):
         x = self.lin(x)
         x = self.batchNorm(x)
         x = self.drop(x)
-        return self.act(x)
+        if self.act is not None:
+            return self.act(x)
 
 class graphConvPool(nn.Module):
 

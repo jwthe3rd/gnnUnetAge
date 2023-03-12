@@ -25,10 +25,10 @@ class AgeNet(nn.Module):
         self.Re_size = args.Re_size
         self.baffle_size = args.baffle_size
         self.dbl_size = args.dbl_size
-        self.bottom_conv_indim = args.lat_dim+self.Re_size+self.baffle_size+self.dbl_size
-        self.bottom_lin = feedFWD(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, self.batch_norm)#bigConv(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, 0.2, self.batch_norm)
+        self.bottom_conv_indim = args.lat_dim#+self.Re_size+self.baffle_size+self.dbl_size
+        self.bottom_lin = feedFWD(self.bottom_conv_indim, self.bottom_conv_indim, self.conv_act, self.batch_norm)#bigConv(self.bottom_conv_indim, self.bottom_conv_indim // 2, self.conv_act, 0.2, self.batch_norm)
         self.bottom_lin2 = feedFWD(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)#bigConv(self.bottom_conv_indim // 2, args.lat_dim, self.conv_act, 0.2, self.batch_norm)
-        self.classify = feedFWD(args.n_classes, args.n_classes, self.conv_act, 0, self.batch_norm)
+        self.classify = nn.Linear(args.n_classes, args.n_classes)
         self.num_features = args.num_features
         self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes
@@ -72,21 +72,21 @@ class AgeNet(nn.Module):
             edge_skips.append(edge_index)
             x, edge_index,_,batch,indc,_ = self.pools[i](x, edge_index, batch=batch)
             indcs.append(indc)
-        Re_mat = np.repeat(input.Re[0].item(), x.shape[0])
-        Re_mat = np.repeat(Re_mat, self.Re_size)
-        Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], self.Re_size))
-        baffle_mat = np.repeat(input.bafflesze[0].item(), x.shape[0])
-        baffle_mat = np.repeat(baffle_mat, self.baffle_size)
-        baffle_mat = torch.reshape(torch.Tensor(baffle_mat), (x.shape[0], self.baffle_size))
-        dbl_mat = np.repeat(input.dbl[0].item(), x.shape[0])
-        dbl_mat = np.repeat(dbl_mat, self.dbl_size)
-        dbl_mat = torch.reshape(torch.Tensor(dbl_mat), (x.shape[0], self.dbl_size))
-        Re_mat = Re_mat.to(self.device)
-        baffle_mat = baffle_mat.to(self.device)
-        dbl_mat = dbl_mat.to(self.device)
-        x = torch.cat((x, Re_mat, baffle_mat, dbl_mat), 1)
+        # Re_mat = np.repeat(input.Re[0].item(), x.shape[0])
+        # Re_mat = np.repeat(Re_mat, self.Re_size)
+        # Re_mat = torch.reshape(torch.Tensor(Re_mat), (x.shape[0], self.Re_size))
+        # baffle_mat = np.repeat(input.bafflesze[0].item(), x.shape[0])
+        # baffle_mat = np.repeat(baffle_mat, self.baffle_size)
+        # baffle_mat = torch.reshape(torch.Tensor(baffle_mat), (x.shape[0], self.baffle_size))
+        # dbl_mat = np.repeat(input.dbl[0].item(), x.shape[0])
+        # dbl_mat = np.repeat(dbl_mat, self.dbl_size)
+        # dbl_mat = torch.reshape(torch.Tensor(dbl_mat), (x.shape[0], self.dbl_size))
+        # Re_mat = Re_mat.to(self.device)
+        # baffle_mat = baffle_mat.to(self.device)
+        # dbl_mat = dbl_mat.to(self.device)
+        # x = torch.cat((x, Re_mat, baffle_mat, dbl_mat), 1)
         x = self.bottom_lin(x)
-        x = self.bottom_lin2(x)
+        # x = self.bottom_lin2(x)
 
         for i in range(self.depth):
 

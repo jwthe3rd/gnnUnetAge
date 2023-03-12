@@ -180,7 +180,7 @@ def run_test(model, data):
 
 if __name__ == "__main__":
     args = get_args()
-    model = AgeNet(args, torch.tanh, torch.tanh)
+    model = AgeNet(args,conv_act=F.relu, pool_act=F.relu)
     model.load_state_dict(torch.load('models/model5_strat'))
     model.to("cuda")
     model.eval()
@@ -188,6 +188,6 @@ if __name__ == "__main__":
     for test in args.test:
         test_acc, test_loss, test_preds = run_test(model, data=test)
         max_iter = find_max_iter(test)
-        #pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
         print(f'Loss is {test_loss}')
         print(f'Acc is {test_acc}')
