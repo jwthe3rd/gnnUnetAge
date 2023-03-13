@@ -188,6 +188,6 @@ if __name__ == "__main__":
     for test in args.test:
         test_acc, test_loss, test_preds = run_test(model, data=test)
         max_iter = find_max_iter(test)
-        pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        #pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
         print(f'Loss is {test_loss}')
         print(f'Acc is {test_acc}')
