@@ -181,7 +181,7 @@ def run_test(model, data):
 if __name__ == "__main__":
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu)
-    model.load_state_dict(torch.load('models/model5_strat'))
+    model.load_state_dict(torch.load('models/model6'))
     model.to("cuda")
     model.eval()
 

@@ -20,6 +20,7 @@ class Trainer:
         self.optimizer = optimizer
         self.lr = args.lr
         self.early_stop = args.early_stop
+        self.optim = self.optimizer(self.model.parameters(), lr=self.lr)
 
     def load_data(self):
 
@@ -37,8 +38,8 @@ class Trainer:
         return 0
 
     def train_step(self, batch, batch_num, loader, train_loss, train_loss_tot, accur, epoch, best_loss, best_acc, worst_acc):
-        optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
-        optimizer.zero_grad()
+        #optimizer = self.optimizer(self.model.parameters(),lr=self.lr)
+        self.optim.zero_grad()
         out = self.model(batch)
         loss = F.nll_loss(out, batch.y)
         train_loss_tot+=loss.item()
@@ -46,7 +47,7 @@ class Trainer:
         acc = torch.mean((preds == batch.y).float())
         # loss += torch.mean(((preds - batch.y)/1.01)**2)
         loss.backward()
-        optimizer.step()
+        self.optim.step()
         train_loss = loss.item()
         accur = acc.item()
         if best_acc < 100*accur:
@@ -76,7 +77,7 @@ class Trainer:
         # if best_loss > val_loss:
         #     best_loss = val_loss
         if batch_num % 10 == 0:
-            print ("\033[A                             \033[A")
+            print ("\033[A                                               \033[A")
             print(f"Epoch: {epoch} | {int(100*batch_num/len(loader))} % ||| Validation Negative Log-Likelihood Loss = {val_loss:.2f}    ||| Validation Accuracy = {100*accur:.2f} %  | Best Acc: {best_val_acc:.2f} Worst Acc: {worst_val_acc:.2f}")
         return val_loss_tot, val_loss_tot / (batch_num + 1), accur, best_val_acc, worst_val_acc
 
