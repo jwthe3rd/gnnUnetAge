@@ -9,47 +9,12 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       dictionary;
+    location    "984/uniform/functionObjects";
+    object      functionObjectProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-5
-(
-    inlet
-    {
-        type            patch;
-        nFaces          10;
-        startFace       11891;
-    }
-    outlet
-    {
-        type            patch;
-        nFaces          10;
-        startFace       11901;
-    }
-    walls
-    {
-        type            wall;
-        inGroups        1(wall);
-        nFaces          423;
-        startFace       11911;
-    }
-    baffle
-    {
-        type            wall;
-        inGroups        1(wall);
-        nFaces          39;
-        startFace       12334;
-    }
-    frontAndBack
-    {
-        type            empty;
-        inGroups        1(empty);
-        nFaces          12132;
-        startFace       12373;
-    }
-)
+
 
 // ************************************************************************* //
