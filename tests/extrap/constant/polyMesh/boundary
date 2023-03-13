@@ -17,38 +17,40 @@ FoamFile
 
 5
 (
-    inlet
+    frontAndBack
     {
-        type            patch;
-        nFaces          10;
-        startFace       11793;
-    }
-    outlet
-    {
-        type            patch;
-        nFaces          10;
-        startFace       11803;
+        type            empty;
+        physicalType    empty;
+        nFaces          5178;
+        startFace       28982;
     }
     walls
     {
         type            wall;
-        inGroups        1(wall);
-        nFaces          423;
-        startFace       11813;
+        physicalType    wall;
+        nFaces          536;
+        startFace       34160;
+    }
+    outlet
+    {
+        type            patch;
+        physicalType    patch;
+        nFaces          14;
+        startFace       34696;
+    }
+    inlet
+    {
+        type            patch;
+        physicalType    patch;
+        nFaces          14;
+        startFace       34710;
     }
     baffle
     {
         type            wall;
-        inGroups        1(wall);
-        nFaces          67;
-        startFace       12236;
-    }
-    frontAndBack
-    {
-        type            empty;
-        inGroups        1(empty);
-        nFaces          12048;
-        startFace       12303;
+        physicalType    wall;
+        nFaces          1542;
+        startFace       34724;
     }
 )
 

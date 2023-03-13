@@ -33,7 +33,7 @@ boundaryField
         value           uniform 0;
     }
 
-    wall
+    walls
     {
         type            nutUBlendedWallFunction;
         value           uniform 0;

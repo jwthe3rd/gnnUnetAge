@@ -1,0 +1,7 @@
+{
+  "file-series-version" : "1.0",
+  "files" : [
+    { "name" : "extrap_0.vtm", "time" : 0 },
+    { "name" : "extrap_2000.vtm", "time" : 2000 }
+  ]
+}
