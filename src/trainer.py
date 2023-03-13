@@ -111,7 +111,7 @@ class Trainer:
         self.validation_acc = []
         epoch_plot = [] #np.linspace(0,self.num_epochs,self.num_epochs)
         count = 0
-        # self.model.load_state_dict(torch.load('models/model5_ckpt'))
+        self.model.load_state_dict(torch.load('models/model6'))
         print('start')
         for epoch in range(self.num_epochs):
             epoch_plot.append(epoch)
@@ -128,45 +128,45 @@ class Trainer:
             worst_acc = float('inf')
             worst_val_acc = float('inf')
             best_val_acc = float('-inf')
-            for i,batch in enumerate(self.train_loader):
-                batch = batch.to(self.device)
-                train_loss, train_accur, best_loss, best_acc, worst_acc, train_loss_tot = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur, epoch=epoch, best_loss=best_loss, best_acc=best_acc, worst_acc=worst_acc, train_loss_tot=train_loss_tot)
-            print('\n')
-            self.model.eval()
+            # for i,batch in enumerate(self.train_loader):
+            #     batch = batch.to(self.device)
+            #     train_loss, train_accur, best_loss, best_acc, worst_acc, train_loss_tot = self.train_step(batch_num=i, batch=batch, loader=self.train_loader, train_loss=train_loss, accur=train_accur, epoch=epoch, best_loss=best_loss, best_acc=best_acc, worst_acc=worst_acc, train_loss_tot=train_loss_tot)
+            # print('\n')
+            self.model.train()
             for i,batch in enumerate(self.val_loader):
                 batch = batch.to(self.device)
-                val_loss_tot, val_loss, val_accur, best_val_acc, worst_val_acc = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, val_loss_tot=val_loss_tot, accur=val_accur, epoch=epoch, best_val_acc=best_val_acc, worst_val_acc=worst_val_acc)
-            self.model.train()
-            if val_loss >= prev_val_loss:
-                count+=1
-                prev_val_loss = val_loss
-            else:
-                count = 0
-                prev_val_loss = val_loss
+                val_loss_tot, val_loss, val_accur, best_val_acc, worst_val_acc = self.val_test(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, val_loss_tot=val_loss_tot, accur=val_accur, epoch=epoch, best_val_acc=best_val_acc, worst_val_acc=worst_val_acc)
+            # self.model.train()
+            # if val_loss >= prev_val_loss:
+            #     count+=1
+            #     prev_val_loss = val_loss
+            # else:
+            #     count = 0
+            #     prev_val_loss = val_loss
 
-            self.training_loss.append(train_loss)
-            self.validation_loss.append(val_loss)
-            self.training_acc.append(train_accur)
-            self.validation_acc.append(val_accur)
+            # self.training_loss.append(train_loss)
+            # self.validation_loss.append(val_loss)
+            # self.training_acc.append(train_accur)
+            # self.validation_acc.append(val_accur)
 
-            if count >= self.early_stop:
-                break
-            torch.save(self.model.state_dict(), 'models/model6_ckpt')
+            # if count >= self.early_stop:
+            #     break
+            # torch.save(self.model.state_dict(), 'models/model6_ckpt')
 
-        torch.save(self.model.state_dict(), 'models/model6')
+        # torch.save(self.model.state_dict(), 'models/model6')
 
-        fig = plt.figure()
-        plt.plot(epoch_plot,self.training_loss, label="training nll loss")
-        plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
-        plt.legend()
-        plt.savefig('./figs/loss_plot.png')
+        # fig = plt.figure()
+        # plt.plot(epoch_plot,self.training_loss, label="training nll loss")
+        # plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
+        # plt.legend()
+        # plt.savefig('./figs/loss_plot.png')
 
-        fig = plt.figure()
+        # fig = plt.figure()
 
-        plt.plot(epoch_plot,self.training_acc, label="training accuracy")
-        plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
-        plt.legend()
-        plt.savefig('./figs/accuracy_plot.png')
+        # plt.plot(epoch_plot,self.training_acc, label="training accuracy")
+        # plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
+        # plt.legend()
+        # plt.savefig('./figs/accuracy_plot.png')
 
 
 

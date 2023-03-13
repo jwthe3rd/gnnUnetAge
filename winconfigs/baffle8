@@ -1,6 +1,6 @@
-batch_size=3
+batch_size=1
 data_path="./data/"
-num_epochs=30
+num_epochs=1
 device="cuda"
 lr=0.0005
 max_v=1.0
