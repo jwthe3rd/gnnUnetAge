@@ -40,4 +40,4 @@ if __name__ == "__main__":
     args = get_args()
     direct = args.direct
 
-    load_boundary_features(direct, save_loc = "../prepData2/")
+    load_boundary_features(direct, save_loc = "./")

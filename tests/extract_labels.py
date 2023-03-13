@@ -204,7 +204,7 @@ for k, value in enumerate(norm_matrix):
 labels_mat = torch.LongTensor(labels_mat)
 if labels_mat.shape[0] != norm_matrix.shape[0]:
     raise Exception("Missing nodes in label mat")
-torch.save(labels_mat, f'../prepData2/l_{direct[:len(direct) - 1]}.pt')
+torch.save(labels_mat, f'./l_{direct[:len(direct) - 1]}.pt')
 
 # print(features_matrix)
 print(norm_matrix)
