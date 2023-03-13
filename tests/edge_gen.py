@@ -43,11 +43,11 @@ def gen_edge(datafile):
 
 if __name__=="__main__":
      
-    data_dir = 'extrap/'
+    data_dir = './extrap/'
 
     for f in os.scandir(data_dir):
 
-        if f.is_file() and f.name[0:1] == 'f_':
+        if f.is_file() and f.name[0:2] == 'f_':
 
 
             edges, edges_attr = gen_edge(datafile=f.path)

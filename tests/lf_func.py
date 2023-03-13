@@ -268,7 +268,7 @@ def calc_dist_inlet_outlet_baffle(polyMesh_dir,list_boundaries):
         inlet_dist = (val - min_in) / div_in
         outlet_dist = (dist_outlet_raw[i] - min_out) / div_out
         baf_dist = (dist_baffle_raw[i] - min_baf) / div_baf 
-        dist_matrix.append([inlet_dist,outlet_dist,baf_dist])
+        dist_matrix.append([inlet_dist,outlet_dist])
 
 
     return dist_matrix
@@ -316,7 +316,7 @@ def create_feature_matrix(list_boundaries, num_of_nodes, dist_matrix, x_c, y_c):
 
         row.append(dist_matrix[index][0])
         row.append(dist_matrix[index][1])
-        row.append(dist_matrix[index][2])
+        #row.append(dist_matrix[index][2])
         row.append(x_c[index])
         row.append(y_c[index])
 
