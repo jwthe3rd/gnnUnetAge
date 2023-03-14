@@ -54,8 +54,10 @@ if __name__=="__main__":
 
     options = vars(args)
 
-    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu) # Sets the args and the activations, inits the network
+    print(args.device)
 
-    trainer = Trainer(args,model, torch.optim.Adam) # trainer class with model and optimizer passed to it.
+    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu, device="cuda") # Sets the args and the activations, inits the network
+
+    trainer = Trainer(args,model, torch.optim.Adam, device=model.device) # trainer class with model and optimizer passed to it.
     trainer.train() #runs training loop
     

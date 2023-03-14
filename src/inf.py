@@ -58,7 +58,7 @@ def pred_to_contour(pred, data, max_iter):
     value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90
 
     for value in pred:
-        labels_mat.append(value_dict[value])
+        labels_mat.append(value_dict[value.item()])
 
     with open(f'tests/{data}/{max_iter}age') as f:
         lines = f.readlines()
@@ -129,9 +129,50 @@ def pred_to_contour(pred, data, max_iter):
 
     return 0
 
+def indcs_to_contour(indcs, max_iter, data):
+    """ This function maps the indices selected in top k pooling and writes them to a contour for visualization """
+    with open(f'tests/{data}/{max_iter}age') as f:
+        lines = f.readlines()
+    f.close()
 
+    for i, index in enumerate(indcs):
+        if i == 0:
+            continue
+        else:
+            indcs[i] = indcs[i-1][index]
+
+    full_file = []
+
+    begin = lines[0:21]
+    begin_data = lines[21:23]
+    num_of_cells = int(begin_data[0])
+
+    end = lines[(23+num_of_cells):]
+    idex = 0
+    full_file.extend(begin)
+    full_file.extend(begin_data)
+
+    for index_tensor in indcs:
+        idex+=1
+        full_file_write = []
+        index_tensor.to('cpu')
+        lines_init = torch.zeros(size=(num_of_cells,))
+        lines_init[index_tensor] = idex
+        full_file_write.extend(full_file)
+        for value in lines_init:
+            full_file_write.append(f'{value} \n')
+        
+        full_file_write.extend(end)
+
+        with open(f'tests/{data}/{max_iter}topk_select_{idex}','w') as g:
+
+            for i in full_file_write:
+                g.write(i)
+        g.close()
+
+    return 0
 @torch.no_grad()
-def run_test(model, data):
+def run_test(model, data, device):
 
     e = torch.load(f'tests/{data}/e_{data}.pt')
     x = torch.load(f'tests/{data}/f_{data}.pt')
@@ -143,23 +184,25 @@ def run_test(model, data):
     loader = DataLoader(datapt, batch_size=1)
 
     for data_test in loader:
-        data_test.to("cuda")
-        out = model(data_test)
+        data_test.to(device)
+        out, indcs = model(data_test, test=True)
         loss = F.nll_loss(out, data_test.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == data_test.y).float())
-    return acc.item(), loss.item(), preds
+    return acc.item(), loss.item(), preds, indcs
 
 if __name__ == "__main__":
+    device = "cuda"
     args = get_args()
-    model = AgeNet(args,conv_act=F.relu, pool_act=F.relu)
-    model.load_state_dict(torch.load('models/model6'))
-    model.to("cuda")
+    model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
+    model.load_state_dict(torch.load('models/model7'))
+    model.to(device)
     #model.eval()
 
     for test in args.test:
-        test_acc, test_loss, test_preds = run_test(model, data=test)
+        test_acc, test_loss, test_preds, indcs = run_test(model, data=test, device=device)
         max_iter = find_max_iter(test)
         pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)
         print(f'Loss is {test_loss}')
         print(f'Acc is {test_acc}')

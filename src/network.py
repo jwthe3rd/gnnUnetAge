@@ -14,7 +14,7 @@ Referenced in trainer.py, main.py, and inf.py
 
 class AgeNet(nn.Module):
 
-    def __init__(self, args,conv_act=F.relu, pool_act=F.relu):
+    def __init__(self, args,conv_act=F.relu, pool_act=F.relu, device='cpu'):
         """ Initializes all of the layers in the network"""
         super(AgeNet, self).__init__()
         self.down_convs = nn.ModuleList()
@@ -39,7 +39,7 @@ class AgeNet(nn.Module):
         self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes
         self.k_p = args.k_p
-        self.device = args.device
+        self.device = device
 
         """ --- Loops for generating all of the up and down convolutions --- """
         for i, dim in enumerate(self.down_conv_dims):
@@ -64,7 +64,7 @@ class AgeNet(nn.Module):
 
         Initializer.weights_init(self)# Same initialization as in the Graph U-nets Paper 
 
-    def forward(self, input):
+    def forward(self, input, test=False):
         """Defining the forward pass of the network"""
         x, edge_index, batch = input.x, input.edge_index, input.batch
 
@@ -91,6 +91,8 @@ class AgeNet(nn.Module):
             x = self.up_convs[i](x, edge_index)
         
         x = self.classify(x) #Final smoothing / classification layer
+        if test:
+            return F.log_softmax(x, dim=1), indcs
 
         return F.log_softmax(x, dim=1)
 

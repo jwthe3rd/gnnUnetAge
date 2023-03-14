@@ -14,13 +14,13 @@ Referenced in the main.py file
 
 class Trainer:
 
-    def __init__(self, args, model, optimizer):
+    def __init__(self, args, model, optimizer, device):
 
         self.batch_size = args.batch_size
         self.path = args.data_path
         self.num_epochs = args.num_epochs
         self.model = model
-        self.device = args.device
+        self.device = device
         self.seed = args.seed
         self.optimizer = optimizer
         self.lr = args.lr
