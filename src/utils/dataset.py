@@ -78,6 +78,8 @@ class gnnAgeDataSet(Dataset):
         edge_index = torch.load(self.edge_paths[idx])
         Y = torch.load(self.label_paths[idx])
 
+        X = X[:,[0,1,2,3,4,5,8]]
+
         if self.test:
             curr_path = self.feats_paths[idx]
 
