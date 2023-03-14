@@ -6,7 +6,18 @@ from network import AgeNet
 import torch
 import torch.nn.functional as F
 
+"""
+This is the main python script for running a training pass of the network, many of the network hyperparameters are set via a config file under the 
+repo /config/. The main way to interact with this file is to run it via the train.sh or train_and_inf.sh from the repo root directory.
+
+command to run in root, "./train.sh {CONFIG FILE SPECIFIED HERE}"
+
+"""
+
 def get_args():
+    """
+    Grabs all hyperparameter values from the config file specified when running ./train.sh
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-batch_size', type=int, default=1, help='batch_size')
@@ -43,8 +54,8 @@ if __name__=="__main__":
 
     options = vars(args)
 
-    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu)
+    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu) # Sets the args and the activations, inits the network
 
-    trainer = Trainer(args,model, torch.optim.Adam)
-    trainer.train()
+    trainer = Trainer(args,model, torch.optim.Adam) # trainer class with model and optimizer passed to it.
+    trainer.train() #runs training loop
     

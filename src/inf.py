@@ -53,7 +53,6 @@ def find_max_iter(dir):
     return f'{max(numbers)}/'
 
 def pred_to_contour(pred, data, max_iter):
-    # vals = np.linspace(0, 1, 11)
     labels_mat = []
     value_dict = collections.defaultdict(int)
     value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90
