@@ -1,4 +1,4 @@
-from network_inf import AgeNet
+from network import AgeNet
 import numpy as np
 import os
 import argparse
@@ -7,6 +7,7 @@ import torch
 import torch.nn.functional as F
 from utils.dataset import gnnAgeDataSet
 from torch_geometric.loader import DataLoader
+import collections
 
 def get_args():
 
@@ -54,34 +55,11 @@ def find_max_iter(dir):
 def pred_to_contour(pred, data, max_iter):
     # vals = np.linspace(0, 1, 11)
     labels_mat = []
-    # for i, val in enumerate(vals):
-    #     vals[i] = round(val, 1)
-
-    # for value in pred:
-    #     if value == len(vals):
-    #         labels_mat.append(1.1)
-    #     elif value == len(vals) + 1:
-    #         labels_mat.append(2.1)
-    #     elif value == len(vals) + 2:
-    #         labels_mat.append(5.1)
-    #     elif value == len(vals) + 3:
-    #         labels_mat.append(10.1)
-    #     elif value == 0:
-    #         labels_mat.append(0)
-    #     else:
-    #         labels_mat.append(vals[value])
+    value_dict = collections.defaultdict(int)
+    value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90
 
     for value in pred:
-        if value == 0:
-            labels_mat.append(0)
-        elif value == 1:
-            labels_mat.append(22.5)
-        elif value == 2:
-            labels_mat.append(45)
-        else:
-            labels_mat.append(90)
-
-
+        labels_mat.append(value_dict[value])
 
     with open(f'tests/{data}/{max_iter}age') as f:
         lines = f.readlines()
@@ -164,18 +142,13 @@ def run_test(model, data):
 
     datapt = gnnAgeDataSet(feats_paths=[f'tests/{data}/f_{data}.pt'], edge_paths=[f'tests/{data}/e_{data}.pt'], label_paths=[f'tests/{data}/l_{data}.pt'], test=True)
     loader = DataLoader(datapt, batch_size=1)
-    # datapt.to("cuda")
+
     for data_test in loader:
         data_test.to("cuda")
-
         out = model(data_test)
-
         loss = F.nll_loss(out, data_test.y)
         _, preds = torch.max(out, 1)
         acc = torch.mean((preds == data_test.y).float())
-        #acc += acc.item()
-        #loss = loss.item()
-    #print ("\033[A                             \033[A")
     return acc.item(), loss.item(), preds
 
 if __name__ == "__main__":

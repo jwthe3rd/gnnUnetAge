@@ -1,7 +1,0 @@
-{
-  "file-series-version" : "1.0",
-  "files" : [
-    { "name" : "0_7Re10_1_0.vtm", "time" : 0 },
-    { "name" : "0_7Re10_1_5000.vtm", "time" : 5000 }
-  ]
-}

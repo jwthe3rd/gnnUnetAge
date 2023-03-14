@@ -1,8 +1,8 @@
 batch_size=4
 data_path="./data/"
 num_epochs=200
-device="cpu"
-lr=0.0005
+device="cuda"
+lr=0.001
 max_v=1.0
 max_L=0.001
 down_conv_dims="64 128 256"
@@ -13,4 +13,4 @@ Re_size=40
 baffle_size=40
 seed=27
 n_classes=15
-k_p=0.6
+k_p=0.7
