@@ -24,19 +24,14 @@ class AgeNet(nn.Module):
         self.conv_act = conv_act
         self.pool_act = pool_act
         self.batch_norm = args.batch_norm
-        self.down_drop = args.down_drop
-        self.up_drop = args.up_drop
+        self.drop = args.drop
         self.up_conv_dims = args.up_conv_dims
         self.down_conv_dims = args.down_conv_dims
         self.depth = len(self.up_conv_dims)
-        self.Re_size = args.Re_size
-        self.baffle_size = args.baffle_size
-        self.dbl_size = args.dbl_size
-        self.bottom_conv_indim = args.lat_dim
-        self.bottom_lin = feedFWD(self.bottom_conv_indim, self.bottom_conv_indim, self.conv_act, self.batch_norm)
+        self.lat_dim = self.down_conv_dims[-1]
+        self.bottom_lin = feedFWD(self.lat_dim, self.lat_dim, self.conv_act, self.batch_norm)
         self.classify = nn.Linear(args.n_classes, args.n_classes)
         self.num_features = args.num_features
-        self.lat_dim = args.lat_dim
         self.n_classes = args.n_classes
         self.k_p = args.k_p
         self.device = device
@@ -44,21 +39,21 @@ class AgeNet(nn.Module):
         """ --- Loops for generating all of the up and down convolutions --- """
         for i, dim in enumerate(self.down_conv_dims):
             if i == 0:
-                self.down_convs.append(bigConv(self.num_features, dim, self.conv_act, self.down_drop[0], self.batch_norm))
+                self.down_convs.append(bigConv(self.num_features, dim, self.conv_act, self.drop[0], self.batch_norm))
                 self.pools.append(TopKPooling(dim, self.k_p))
             else:
-                self.down_convs.append(bigConv(self.down_conv_dims[i-1], dim, self.conv_act, self.down_drop[i-1], self.batch_norm ))
+                self.down_convs.append(bigConv(self.down_conv_dims[i-1], dim, self.conv_act, self.drop[i-1], self.batch_norm ))
                 self.pools.append(TopKPooling(dim, self.k_p))
 
         for i, dim in enumerate(self.up_conv_dims):
             if i == 0:
-                self.up_convs.append(bigConv(self.lat_dim*2, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
+                self.up_convs.append(bigConv(self.lat_dim*2, self.up_conv_dims[i+1], self.conv_act, self.drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
             elif i == self.depth-1:
                 self.up_convs.append(bigConv(dim*2, self.n_classes, self.conv_act, 0.0, False)) 
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device)) 
             else:
-                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, self.up_drop[i], self.batch_norm ))
+                self.up_convs.append(bigConv(self.up_conv_dims[i]*2, self.up_conv_dims[i+1], self.conv_act, self.drop[i], self.batch_norm ))
                 self.unpools.append(graphConvUnpool(self.pool_act, self.up_conv_dims[i], self.device))
         """ ------------------- -------------------------------------"""
 
