@@ -8,8 +8,13 @@ import torch.nn.functional as F
 from utils.dataset import gnnAgeDataSet
 from torch_geometric.loader import DataLoader
 import collections
+"""
 
+This file is in place to run inference on the trained model
+
+"""
 def get_args():
+    """Boiler plate from the model setup as I am lazy"""
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-batch_size', type=int, default=1, help='batch_size')
@@ -40,7 +45,7 @@ def get_args():
 
 
 def find_max_iter(dir):
-
+    """ Basic function to find the max iteration (the converged solution) in an OpenFOAM case"""
     numbers = []
 
     for d in os.scandir(f'tests/{dir}/'):
@@ -53,13 +58,14 @@ def find_max_iter(dir):
     return f'{max(numbers)}/'
 
 def pred_to_contour(pred, data, max_iter):
+    """ This function serves to generate the contour visualization for the ground truth and prediction"""
     labels_mat = []
     value_dict = collections.defaultdict(int)
-    value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90
+    value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90 # value mapping for prediction -> contour
 
     for value in pred:
         labels_mat.append(value_dict[value.item()])
-
+    """ == Lots of code to take the actual age file output from openfoam and create a clone with the GT and prediction values =="""
     with open(f'tests/{data}/{max_iter}age') as f:
         lines = f.readlines()
     f.close()
@@ -73,12 +79,11 @@ def pred_to_contour(pred, data, max_iter):
     
     full_file = []
     full_file_2 = []
-    for val in begin:
-        full_file.append(val)
-        full_file_2.append(val)
-    for val in begin_data:
-        full_file.append(val)
-        full_file_2.append(val)
+    full_file.extend(begin)
+    full_file_2.extend(begin)
+    full_file.extend(begin_data)
+    full_file_2.extend(begin_data)
+
     for i in labels_mat:
         full_file.append(str(i) + '\n')
     for val in age_data:
@@ -92,6 +97,7 @@ def pred_to_contour(pred, data, max_iter):
         else:
             full_file_2.append('0\n')
     for val in end:
+        """ Random hack to allow for the boundary values to not be the original values from the age file """
         try:
             if val.split()[1] == 'nonuniform':
                 print(1)
@@ -114,7 +120,11 @@ def pred_to_contour(pred, data, max_iter):
             full_file.append(val)
             full_file_2.append(val)
 
+    """ ==========================="""
 
+    """ Write the output to the converged folder for simplicity and to be
+        read in the foamToVTK command for visualization
+    """
     with open(f'tests/{data}/{max_iter}age_norm_pred','w') as g:
 
         for i in full_file:
@@ -134,13 +144,15 @@ def indcs_to_contour(indcs, max_iter, data):
     with open(f'tests/{data}/{max_iter}age') as f:
         lines = f.readlines()
     f.close()
-
+    """ == Remapping for the original index in the whole mesh == """
     for i, index in enumerate(indcs):
         if i == 0:
             continue
         else:
             indcs[i] = indcs[i-1][index]
+    """ ================================ """
 
+    """ The rest of this matches with the logic in the write_prediction_to_contour function """
     full_file = []
 
     begin = lines[0:21]
