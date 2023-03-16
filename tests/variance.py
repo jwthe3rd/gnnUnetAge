@@ -47,7 +47,7 @@ def load_feature_scalar(case, dir,file, norm=False):
 
 if __name__=="__main__":
 
-    tests = ['0_8_2-00740_9/','0_54_445_6/','dbl_0_4_485_2/']
+    tests = ['0_8_2-00740_9/','0_54_445_6/','dbl_0_4_485_2/', '0_55_6-00360_9/', 'dbl_0_55_3-00620_9/', 'dbl_0_56_881_2/']
 
     for test_file in tests:
 
@@ -56,8 +56,8 @@ if __name__=="__main__":
         norm_age_data = load_feature_scalar(test_file, dir=max_dir, file='age', norm=True)
         pred_age_data = load_feature_scalar(test_file, dir=max_dir, file='age_norm_pred')
 
-        print(f'{max(norm_age_data)}')
-        print(f'{max(age_data) / 22.5} | {max(age_data)}')
-
-        print(f'Var Age: {np.sqrt(stats.variance(age_data))} | Var Norm Age: {np.sqrt(stats.variance(norm_age_data))} | Var Pred Age: {np.sqrt(stats.variance(pred_age_data)) / 90}')
-        print(f'Error : {100*(np.sqrt(stats.variance(age_data)) - np.sqrt(stats.variance(norm_age_data))) / np.sqrt(stats.variance(age_data)):.2f}')
+        # print(f'{max(norm_age_data)}')
+        # print(f'{max(age_data) / 22.5} | {max(age_data)}')
+        print(f'Test : {test_file}')
+        print(f'Var Age: {np.sqrt(stats.variance(age_data))} | Var Norm Age: {np.sqrt(stats.variance(norm_age_data))} | Var Pred Age: {np.sqrt(stats.variance(pred_age_data))}')
+        print(f'Error : {100*abs(np.sqrt(stats.variance(age_data)) - np.sqrt(stats.variance(pred_age_data))) / np.sqrt(stats.variance(age_data)):.2f}')
