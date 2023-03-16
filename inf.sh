@@ -18,7 +18,7 @@ run() {
     -n_classes $n_classes \
     -k_p $k_p \
     -batch_norm $batch_norm \
-    -down_drop $down_drop \
+    -drop $drop \
     -up_drop $up_drop \
     -test $test
 

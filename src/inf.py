@@ -14,13 +14,16 @@ This file is in place to run inference on the trained model
 
 """
 def get_args():
-    """Boiler plate from the model setup as I am lazy"""
+    """
+    Grabs all hyperparameter values from the config file specified when running ./inf.sh
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-batch_size', type=int, default=1, help='batch_size')
     parser.add_argument('-seed', type=int, default=24, help='seed')
     parser.add_argument('-num_epochs', type=int, default=100, help='num_epochs')
     parser.add_argument('-n_classes', type=int, default=100, help='n_classes')
+    parser.add_argument('-early_stop', type=int, default=5, help='early_stop')
     parser.add_argument('-k_p', type=float, default=0.5, help='k_p')
     parser.add_argument('-num_features', type=int, default=100, help='num_features')
     parser.add_argument('-lat_dim', type=int, default=5, help='lat_dim')
@@ -33,11 +36,11 @@ def get_args():
     parser.add_argument('-data_path', type=str, default='../data/', help='data_path')
     parser.add_argument('-device', type=str, default='cpu', help='device')
     parser.add_argument('-batch_norm', type=bool, default=False, help='batch_norm')
-    parser.add_argument('-down_drop', type=float, nargs='+',default=[0.7], help='down_drop')
+    parser.add_argument('-drop', type=float, nargs='+',default=[0.7], help='drop')
     parser.add_argument('-up_drop', type=float, nargs='+',default=[0.7], help='up_drop')
     parser.add_argument('-up_conv_dims', type=int, nargs='+',default=[200, 100, 50, 10], help='up_conv_dims')
     parser.add_argument('-down_conv_dims', type=int, nargs='+',default=[10, 50, 100, 200], help='down_conv_dims')
-    parser.add_argument('-test', type=str, nargs='+', default='', help='test')
+    parser.add_argument('-test', type=str, nargs='+',default='', help='test' )
 
     args, _ = parser.parse_known_args()
 
@@ -61,10 +64,11 @@ def pred_to_contour(pred, data, max_iter):
     """ This function serves to generate the contour visualization for the ground truth and prediction"""
     labels_mat = []
     value_dict = collections.defaultdict(int)
-    value_dict[0], value_dict[1], value_dict[2], value_dict[3] = 0, 22.5, 45, 90 # value mapping for prediction -> contour
+    norm_vals = np.asarray([0, 2, 5, 10, 15, 20, 25, 30, 40, 50]) # value mapping for prediction -> contour
+    cats = 22.5*norm_vals
 
     for value in pred:
-        labels_mat.append(value_dict[value.item()])
+        labels_mat.append(cats[value.item()])
     """ == Lots of code to take the actual age file output from openfoam and create a clone with the GT and prediction values =="""
     with open(f'tests/{data}/{max_iter}age') as f:
         lines = f.readlines()
@@ -84,18 +88,22 @@ def pred_to_contour(pred, data, max_iter):
     full_file.extend(begin_data)
     full_file_2.extend(begin_data)
 
+    feature_values = np.empty_like(age_data)
+
     for i in labels_mat:
         full_file.append(str(i) + '\n')
-    for val in age_data:
+    for i, val in enumerate(age_data):
         norm = val / 22.5
-        if norm > 1 and norm <= 2.0:
-            full_file_2.append('22.5\n')
-        elif norm >2 and norm <= 5.0:
-            full_file_2.append('45\n')
-        elif norm > 5.0:
-            full_file_2.append('90\n')
-        else:
-            full_file_2.append('0\n')
+        categorized = False
+        for j, cat in enumerate(norm_vals):
+            if norm > cat:
+                feature_values[i] = cats[j]
+                categorized = True
+        if not categorized:
+            feature_values[i] = cats[-1]
+        full_file_2.append(f'{feature_values[i]} \n')
+
+                
     for val in end:
         """ Random hack to allow for the boundary values to not be the original values from the age file """
         try:
@@ -188,11 +196,11 @@ def run_test(model, data, device):
 
     e = torch.load(f'tests/{data}/e_{data}.pt')
     x = torch.load(f'tests/{data}/f_{data}.pt')
-    y = torch.load(f'tests/{data}/l_{data}.pt')
+    y = torch.load(f'tests/{data}/l10_{data}.pt')
     print(data)
     print(data[2])
 
-    datapt = gnnAgeDataSet(feats_paths=[f'tests/{data}/f_{data}.pt'], edge_paths=[f'tests/{data}/e_{data}.pt'], label_paths=[f'tests/{data}/l_{data}.pt'], test=True)
+    datapt = gnnAgeDataSet(feats_paths=[f'tests/{data}/f_{data}.pt'], edge_paths=[f'tests/{data}/e_{data}.pt'], label_paths=[f'tests/{data}/l10_{data}.pt'], test=True)
     loader = DataLoader(datapt, batch_size=1)
 
     for data_test in loader:
@@ -207,7 +215,7 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/model7'))
+    model.load_state_dict(torch.load('models/model8'))
     model.to(device)
     #model.eval()
 
