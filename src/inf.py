@@ -215,14 +215,14 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/model8'))
+    model.load_state_dict(torch.load('models/model9'))
     model.to(device)
     #model.eval()
 
     for test in args.test:
         test_acc, test_loss, test_preds, indcs = run_test(model, data=test, device=device)
         max_iter = find_max_iter(test)
-        pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
-        indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)
+        #pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        #indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)
         print(f'Loss is {test_loss}')
         print(f'Acc is {test_acc}')

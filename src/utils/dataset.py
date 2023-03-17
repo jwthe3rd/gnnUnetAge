@@ -101,9 +101,11 @@ class gnnAgeDataSet(Dataset):
             split_check = curr_path.split('-')
 
             if len(split_check) == 3:
-                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = np.log10(float(f'{split_check[1][-1]}.{split_check[2][0:len(split_check[2]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
             else:
-                Re_num = 0
+                split = curr_path.split('_')
+                Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
 
             print(f'Re is: {Re_num}')
             print(f'Baffle Size is : {bafflesze}')
@@ -127,9 +129,16 @@ class gnnAgeDataSet(Dataset):
             split_check = curr_path.split('-')
 
             if len(split_check) == 2:
-                Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
+                Re_num = np.log10(float(f'{split_check[0][-1]}.{split_check[1][0:len(split_check[1]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
             else:
-                Re_num= 0
+                # Re_num= 0
+                split = curr_path.split('_')
+                Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
+            # print(f'Re is: {Re_num}')
+            # print(f'Baffle Size is : {bafflesze}')
+            # print(f'Double is : {double}')
+
 
         Re_num = torch.tensor(np.repeat(Re_num, X.shape[0]), dtype=torch.float32).reshape(-1,1)
         bafflesze = torch.tensor(np.repeat(bafflesze, X.shape[0]), dtype=torch.float32).reshape(-1,1)
