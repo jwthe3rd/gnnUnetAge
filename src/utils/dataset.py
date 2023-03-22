@@ -107,9 +107,9 @@ class gnnAgeDataSet(Dataset):
                 split = curr_path.split('_')
                 Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
 
-            print(f'Re is: {Re_num}')
-            print(f'Baffle Size is : {bafflesze}')
-            print(f'Double is : {double}')
+            print(f'Re is {Re_num}')
+            print(f'BaffleSize is {bafflesze}')
+            print(f'Double is {double}')
         else:
             curr_path = self.feats_paths[idx]
 

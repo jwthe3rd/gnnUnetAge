@@ -51,7 +51,7 @@ def find_max_iter(dir):
     """ Basic function to find the max iteration (the converged solution) in an OpenFOAM case"""
     numbers = []
 
-    for d in os.scandir(f'tests/{dir}/'):
+    for d in os.scandir(f'testRuns/{dir}/'):
         if d.is_dir():
             try:
                 numbers.append(int(d.name))
@@ -70,7 +70,7 @@ def pred_to_contour(pred, data, max_iter):
     for value in pred:
         labels_mat.append(cats[value.item()])
     """ == Lots of code to take the actual age file output from openfoam and create a clone with the GT and prediction values =="""
-    with open(f'tests/{data}/{max_iter}age') as f:
+    with open(f'testRuns/{data}/{max_iter}age') as f:
         lines = f.readlines()
     f.close()
 
@@ -108,7 +108,6 @@ def pred_to_contour(pred, data, max_iter):
         """ Random hack to allow for the boundary values to not be the original values from the age file """
         try:
             if val.split()[1] == 'nonuniform':
-                print(1)
                 num_nodes = int(val.split()[3].split('(')[0])
                 starting = f'{num_nodes}(0.0 '
                 for i in range(num_nodes-2):
@@ -118,7 +117,6 @@ def pred_to_contour(pred, data, max_iter):
                 full_file.append(new_val)
                 full_file_2.append(new_val)
             elif val.split()[1] == 'uniform':
-                print(2)
                 full_file.append(f'{val.split()[0]}    uniform 0;')
                 full_file_2.append(f'{val.split()[0]}    uniform 0;')
             else:
@@ -133,13 +131,13 @@ def pred_to_contour(pred, data, max_iter):
     """ Write the output to the converged folder for simplicity and to be
         read in the foamToVTK command for visualization
     """
-    with open(f'tests/{data}/{max_iter}age_norm_pred','w') as g:
+    with open(f'testRuns/{data}/{max_iter}age_norm_pred','w') as g:
 
         for i in full_file:
             g.write(i)
     g.close()
 
-    with open(f'tests/{data}/{max_iter}age_norm_gt','w') as g:
+    with open(f'testRuns/{data}/{max_iter}age_norm_gt','w') as g:
 
         for i in full_file_2:
             g.write(i)
@@ -149,7 +147,7 @@ def pred_to_contour(pred, data, max_iter):
 
 def indcs_to_contour(indcs, max_iter, data):
     """ This function maps the indices selected in top k pooling and writes them to a contour for visualization """
-    with open(f'tests/{data}/{max_iter}age') as f:
+    with open(f'testRuns/{data}/{max_iter}age') as f:
         lines = f.readlines()
     f.close()
     """ == Remapping for the original index in the whole mesh == """
@@ -184,7 +182,7 @@ def indcs_to_contour(indcs, max_iter, data):
         
         full_file_write.extend(end)
 
-        with open(f'tests/{data}/{max_iter}topk_select_{idex}','w') as g:
+        with open(f'testRuns/{data}/{max_iter}topk_select_{idex}','w') as g:
 
             for i in full_file_write:
                 g.write(i)
@@ -194,13 +192,13 @@ def indcs_to_contour(indcs, max_iter, data):
 @torch.no_grad()
 def run_test(model, data, device):
 
-    e = torch.load(f'tests/{data}/e_{data}.pt')
-    x = torch.load(f'tests/{data}/f_{data}.pt')
-    y = torch.load(f'tests/{data}/l10_{data}.pt')
-    print(data)
-    print(data[2])
+    e = torch.load(f'testRuns/{data}/e_{data}.pt')
+    x = torch.load(f'testRuns/{data}/f_{data}.pt')
+    y = torch.load(f'testRuns/{data}/l10_{data}.pt')
+    print(f'Case is {data}')
+    #print(data[2])
 
-    datapt = gnnAgeDataSet(feats_paths=[f'tests/{data}/f_{data}.pt'], edge_paths=[f'tests/{data}/e_{data}.pt'], label_paths=[f'tests/{data}/l10_{data}.pt'], test=True)
+    datapt = gnnAgeDataSet(feats_paths=[f'testRuns/{data}/f_{data}.pt'], edge_paths=[f'testRuns/{data}/e_{data}.pt'], label_paths=[f'testRuns/{data}/l10_{data}.pt'], test=True)
     loader = DataLoader(datapt, batch_size=1)
 
     for data_test in loader:
@@ -218,11 +216,15 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load('models/model9'))
     model.to(device)
     #model.eval()
+    test_files = []
+    for d in os.scandir('testRuns/'):
 
-    for test in args.test:
+        if d.is_dir():
+            test_files.append(d.name)
+    for test in test_files:
         test_acc, test_loss, test_preds, indcs = run_test(model, data=test, device=device)
         max_iter = find_max_iter(test)
-        #pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
-        #indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)
+        pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
+        indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)
         print(f'Loss is {test_loss}')
         print(f'Acc is {test_acc}')
