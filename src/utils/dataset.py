@@ -20,7 +20,7 @@ class DataGenerator:
         self.path = path
         self.seed = seed
 
-    def segment_data(self):
+    def segment_data(self, tuning=False):
         training_cases = os.listdir(self.path)
         """ List initialization """
         edge_train = []
@@ -36,6 +36,11 @@ class DataGenerator:
         for data_file in training_cases:
             if data_file[0] == 'f' and data_file[2:] not in unique_cases:
                 unique_cases.append(data_file[2:])
+
+        if tuning:
+            num_select = (len(unique_cases) * 2) // 10
+            random.seed(68)
+            unique_cases = random.sample(unique_cases, num_select)
 
         for case in unique_cases:
             Re_list.append(1 if len(case.split('-'))==2 else 0) # Creates a list identifying high or low Re for stratification

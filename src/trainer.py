@@ -12,6 +12,7 @@ from the training run.
 Referenced in the main.py file
 """
 
+
 class Trainer:
 
     def __init__(self, args, model, optimizer, device):
@@ -27,6 +28,7 @@ class Trainer:
         self.early_stop = args.early_stop
         self.optim = self.optimizer(self.model.parameters(), lr=self.lr) # Sets the optimizer
         self.model.to(self.device) # Sends the model to the specified device from the config file
+        self.TRAIN_RUN = f'model_lr_{self.lr}_depth_{model.depth}_k_{model.k_p}'
 
     def load_data(self):
         """
@@ -34,7 +36,7 @@ class Trainer:
 
         Finally the dataset is input as a DataLoader, to allow for on the fly loading of data. 
         """
-        y_train, x_train, e_train, y_val, x_val, e_val = DataGenerator(path=self.path, seed=self.seed).segment_data()
+        y_train, x_train, e_train, y_val, x_val, e_val = DataGenerator(path=self.path, seed=self.seed).segment_data(tuning=True)
         training_dataset = gnnAgeDataSet(e_train, x_train, y_train)
         validation_dataset = gnnAgeDataSet(e_val, x_val, y_val)
 
@@ -65,7 +67,7 @@ class Trainer:
             best_loss = train_loss
         if batch_num % 10 == 0:
             print ("\033[A                             \033[A")
-            print(f"Epoch:{epoch} | {int(100*batch_num/len(loader))} % | T NLL Loss = {train_loss:.2f}  Best Loss: {best_loss:.2f}| T Acc = {100*accur:.2f} %  Best Acc: {best_acc:.2f} %  Worst Acc: {worst_acc:.2f}    ")
+            print(f"Epoch:{epoch} T | {int(100*batch_num/len(loader))} % | L = {train_loss:.2f}  Best L: {best_loss:.2f}| A = {100*accur:.2f} % B A: {best_acc:.2f} % W A: {worst_acc:.2f}")
         return  train_loss_tot / (batch_num + 1), accur, best_loss, best_acc, worst_acc, train_loss_tot
     
     @torch.no_grad()
@@ -86,7 +88,7 @@ class Trainer:
             worst_val_acc = 100*accur
         if batch_num % 10 == 0:
             print ("\033[A                                               \033[A")
-            print(f"Epoch: {epoch} | {int(100*batch_num/len(loader))} % ||| Validation Negative Log-Likelihood Loss = {val_loss:.2f}    ||| Validation Accuracy = {100*accur:.2f} %  | Best Acc: {best_val_acc:.2f} Worst Acc: {worst_val_acc:.2f}")
+            print(f"Epoch: V {epoch} | {int(100*batch_num/len(loader))} % | L = {val_loss:.2f}  | A = {100*accur:.2f} % | B A: {best_val_acc:.2f} % W A: {worst_val_acc:.2f}%")
         return val_loss_tot, val_loss_tot / (batch_num + 1), accur, best_val_acc, worst_val_acc
 
     @torch.no_grad()
@@ -119,7 +121,9 @@ class Trainer:
         self.validation_acc = []
         epoch_plot = [] 
         count = 0
+        prev_val_loss = 0
         #self.model.load_state_dict(torch.load('models/model6'))
+        print(self.TRAIN_RUN)
         print('start')
         for epoch in range(self.num_epochs):
             epoch_plot.append(epoch)
@@ -129,7 +133,6 @@ class Trainer:
             val_loss = 0
             train_accur = 0
             val_accur = 0
-            prev_val_loss = 0
             val_loss_tot = 0
             train_loss_tot = 0
             best_loss = float('inf')
@@ -152,11 +155,15 @@ class Trainer:
                 val_loss_tot, val_loss, val_accur, best_val_acc, worst_val_acc = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, val_loss_tot=val_loss_tot, accur=val_accur, epoch=epoch, best_val_acc=best_val_acc, worst_val_acc=worst_val_acc)
             # self.model.train()
             """ -------------------------------"""
+            print(val_loss)
+            print(prev_val_loss)
             if val_loss >= prev_val_loss:           ### Early
-                count+=1                            ### Stopping
+                count+=1
+                print(val_loss)                            ### Stopping
                 prev_val_loss = val_loss            ### Stuff
             else:
                 count = 0
+                print(val_loss, 'peepee')
                 prev_val_loss = val_loss
 
             self.training_loss.append(train_loss)
@@ -166,24 +173,26 @@ class Trainer:
 
             if count >= self.early_stop:
                 break
-            torch.save(self.model.state_dict(), 'models/model9_ckpt')
+            torch.save(self.model.state_dict(), f'models/{self.TRAIN_RUN}_ckpt')
 
-        torch.save(self.model.state_dict(), 'models/model9')
+        torch.save(self.model.state_dict(), f'models/{self.TRAIN_RUN}')
 
         """ -- Plotting training results ----"""
 
         fig = plt.figure()
         plt.plot(epoch_plot,self.training_loss, label="training nll loss")
         plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
+        plt.plot([0], [0], label=f"Loss: {self.validation_loss[-1]:.2f} + N: {len(epoch_plot)}")
         plt.legend()
-        plt.savefig('./figs/loss_plot_10class_model9.png')
+        plt.savefig(f'./figs/{self.TRAIN_RUN}_loss.png')
 
         fig = plt.figure()
 
         plt.plot(epoch_plot,self.training_acc, label="training accuracy")
         plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
+        plt.plot([0], [0], label=f"Acc: {self.validation_acc[-1]:.2f}")
         plt.legend()
-        plt.savefig('./figs/accuracy_plot_10class_model9.png')
+        plt.savefig(f'./figs/{self.TRAIN_RUN}_accuracy.png')
         """---------------------------------------"""
 
 
