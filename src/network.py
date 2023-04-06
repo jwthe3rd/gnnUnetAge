@@ -28,6 +28,7 @@ class AgeNet(nn.Module):
         self.down_conv_dims = args.down_conv_dims
         self.up_conv_dims = self.down_conv_dims[::-1]#args.up_conv_dims
         self.depth = len(self.up_conv_dims)
+        print(self.up_conv_dims)
         self.lat_dim = self.down_conv_dims[-1]
         self.bottom_lin = feedFWD(self.lat_dim, self.lat_dim, self.conv_act, self.batch_norm)
         self.classify = nn.Linear(args.n_classes, args.n_classes)
