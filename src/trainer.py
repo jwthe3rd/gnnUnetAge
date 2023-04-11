@@ -36,7 +36,7 @@ class Trainer:
 
         Finally the dataset is input as a DataLoader, to allow for on the fly loading of data. 
         """
-        y_train, x_train, e_train, y_val, x_val, e_val = DataGenerator(path=self.path, seed=self.seed).segment_data(tuning=True)
+        y_train, x_train, e_train, y_val, x_val, e_val = DataGenerator(path=self.path, seed=self.seed).segment_data()
         training_dataset = gnnAgeDataSet(e_train, x_train, y_train)
         validation_dataset = gnnAgeDataSet(e_val, x_val, y_val)
 
@@ -69,7 +69,7 @@ class Trainer:
             print ("\033[A                             \033[A")
             print(f"Epoch:{epoch} T | {int(100*batch_num/len(loader))} % | L = {train_loss:.2f}  Best L: {best_loss:.2f}| A = {100*accur:.2f} % B A: {best_acc:.2f} % W A: {worst_acc:.2f}")
         return  train_loss_tot / (batch_num + 1), accur, best_loss, best_acc, worst_acc, train_loss_tot
-    
+
     @torch.no_grad()
     def val_step(self, batch, batch_num, loader, val_loss, val_loss_tot, accur, epoch, best_val_acc, worst_val_acc):
         """
@@ -123,8 +123,8 @@ class Trainer:
         count = 0
         prev_val_loss = 0
         #self.model.load_state_dict(torch.load('models/model6'))
-        print(self.TRAIN_RUN)
-        print('start')
+        #print(self.TRAIN_RUN)
+        #print('start')
         for epoch in range(self.num_epochs):
             epoch_plot.append(epoch)
             print('\n')
@@ -155,15 +155,11 @@ class Trainer:
                 val_loss_tot, val_loss, val_accur, best_val_acc, worst_val_acc = self.val_step(batch_num=i, batch=batch, loader=self.val_loader, val_loss=val_loss, val_loss_tot=val_loss_tot, accur=val_accur, epoch=epoch, best_val_acc=best_val_acc, worst_val_acc=worst_val_acc)
             # self.model.train()
             """ -------------------------------"""
-            print(val_loss)
-            print(prev_val_loss)
             if val_loss >= prev_val_loss:           ### Early
-                count+=1
-                print(val_loss)                            ### Stopping
+                count+=1                            ### Stopping
                 prev_val_loss = val_loss            ### Stuff
             else:
                 count = 0
-                print(val_loss, 'peepee')
                 prev_val_loss = val_loss
 
             self.training_loss.append(train_loss)
@@ -173,26 +169,26 @@ class Trainer:
 
             if count >= self.early_stop:
                 break
-            torch.save(self.model.state_dict(), f'models/{self.TRAIN_RUN}_ckpt')
+            torch.save(self.model.state_dict(), f'models/final_{self.TRAIN_RUN}_ckpt')
 
-        torch.save(self.model.state_dict(), f'models/{self.TRAIN_RUN}')
+        torch.save(self.model.state_dict(), f'models/final_{self.TRAIN_RUN}')
 
         """ -- Plotting training results ----"""
 
         fig = plt.figure()
         plt.plot(epoch_plot,self.training_loss, label="training nll loss")
         plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
-        plt.plot([0], [0], label=f"Loss: {self.validation_loss[-1]:.2f} + N: {len(epoch_plot)}")
+        #plt.plot([0], [0], label=f"Loss: {self.validation_loss[-1]:.2f} + N: {len(epoch_plot)}")
         plt.legend()
-        plt.savefig(f'./figs/{self.TRAIN_RUN}_loss.png')
+        plt.savefig(f'./figs/final_{self.TRAIN_RUN}_loss.png')
 
         fig = plt.figure()
 
         plt.plot(epoch_plot,self.training_acc, label="training accuracy")
         plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
-        plt.plot([0], [0], label=f"Acc: {self.validation_acc[-1]:.2f}")
+        #plt.plot([0], [0], label=f"Acc: {self.validation_acc[-1]:.2f}")
         plt.legend()
-        plt.savefig(f'./figs/{self.TRAIN_RUN}_accuracy.png')
+        plt.savefig(f'./figs/final_{self.TRAIN_RUN}_accuracy.png')
         """---------------------------------------"""
 
 

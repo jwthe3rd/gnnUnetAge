@@ -1,0 +1,49 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _7bdb509494-20201222 OPENFOAM=2012
+Arch   : "LSB;label=32;scalar=64"
+Exec   : foamToVTK
+Date   : Feb 23 2023
+Time   : 14:03:02
+Host   : johnsDesktop
+PID    : 4621
+I/O    : uncollated
+Case   : /home/john/of_runs/cases/dbl_0_17_1-00900_9
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Initial memory 205800 kB
+Create mesh for time = 0
+
+VTK mesh topology: 0.03 s, 209240 kB
+Time: 0
+    volScalar    : age k nuTilda nut omega p
+    volVector    : U
+    Internal  : "VTK/dbl_0_17_1-00900_9_0/internal.vtu"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_0/boundary/inlet.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_0/boundary/outlet.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_0/boundary/walls.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_0/boundary/baffle.vtp"
+Wrote in 0.03 s, 213604 kB
+Time: 569
+    volScalar    : age k nut omega p
+    volVector    : U
+    Internal  : "VTK/dbl_0_17_1-00900_9_569/internal.vtu"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_569/boundary/inlet.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_569/boundary/outlet.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_569/boundary/walls.vtp"
+    Boundary  : "VTK/dbl_0_17_1-00900_9_569/boundary/baffle.vtp"
+Wrote in 0.04 s, 213824 kB
+
+End: 0.1 s, 215632 kB (peak)
+

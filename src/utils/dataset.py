@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from torch_geometric.data import Data
 import torch
 import random
+import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
 
@@ -13,6 +14,11 @@ import numpy as np
     Referenced in trainer.py and inf.py
 
 """
+
+df = pd.read_csv('~/repos/gnnUnetAge/Re_keys.csv')
+RE_KEYS = df.set_index('key').T.to_dict('list')
+
+print(RE_KEYS)
 
 class DataGenerator:
     """ Generates a list of data for x, edges, and ys from a directory of .pt tensors and segments to training and testing sets """
@@ -107,10 +113,17 @@ class gnnAgeDataSet(Dataset):
 
             if len(split_check) == 3:
                 # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
-                Re_num = np.log10(float(f'{split_check[1][-1]}.{split_check[2][0:len(split_check[2]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
+                split = curr_path.split('_')
+                Re_num_key = f'{split[len(split)-2]}_{split[len(split)-1][:len(split[len(split)-1])-3]}'
+                #print(Re_num_key)
+                Re_num = RE_KEYS[Re_num_key][1]
+                #Re_num = np.log10(float(f'{split_check[1][-1]}.{split_check[2][0:len(split_check[2]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
             else:
                 split = curr_path.split('_')
-                Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
+                Re_num_key = f'{split[len(split)-2]}_{split[len(split)-1][:len(split[len(split)-1])-3]}'
+                #print(Re_num_key)
+                Re_num = RE_KEYS[Re_num_key][1]
+                #Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
 
             print(f'Re is {Re_num}')
             print(f'BaffleSize is {bafflesze}')
@@ -135,11 +148,20 @@ class gnnAgeDataSet(Dataset):
 
             if len(split_check) == 2:
                 # Re_num = (int(self.feats_paths[idx][len(self.feats_paths[idx])-4]))
-                Re_num = np.log10(float(f'{split_check[0][-1]}.{split_check[1][0:len(split_check[1]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
+                split = curr_path.split('_')
+                #print(split)
+                Re_num_key = f'{split[len(split)-2]}_{split[len(split)-1][:len(split[len(split)-1])-3]}'
+                #print(Re_num_key)
+                Re_num = RE_KEYS[Re_num_key][1]
+                #Re_num = np.log10(float(f'{split_check[0][-1]}.{split_check[1][0:len(split_check[1]) - 6]}')*10**(int(self.feats_paths[idx][len(self.feats_paths[idx])-4])))
             else:
                 # Re_num= 0
                 split = curr_path.split('_')
-                Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
+                #print(split)
+                Re_num_key = f'{split[len(split)-2]}_{split[len(split)-1][:len(split[len(split)-1])-3]}'
+                #print(Re_num_key)
+                Re_num = RE_KEYS[Re_num_key][1]
+                #Re_num = np.log10(float(f'{split[-2]}.{split[-1][0:len(split[-1]) - 4]}'))
             # print(f'Re is: {Re_num}')
             # print(f'Baffle Size is : {bafflesze}')
             # print(f'Double is : {double}')
