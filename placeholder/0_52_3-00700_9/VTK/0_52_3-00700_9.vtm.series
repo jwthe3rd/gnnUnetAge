@@ -1,0 +1,7 @@
+{
+  "file-series-version" : "1.0",
+  "files" : [
+    { "name" : "0_52_3-00700_9_0.vtm", "time" : 0 },
+    { "name" : "0_52_3-00700_9_617.vtm", "time" : 617 }
+  ]
+}

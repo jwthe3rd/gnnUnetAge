@@ -1,0 +1,7 @@
+{
+  "file-series-version" : "1.0",
+  "files" : [
+    { "name" : "dbl_0_35_8-00200_9_0.vtm", "time" : 0 },
+    { "name" : "dbl_0_35_8-00200_9_503.vtm", "time" : 503 }
+  ]
+}
