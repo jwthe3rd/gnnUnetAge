@@ -169,9 +169,9 @@ class Trainer:
 
             if count >= self.early_stop:
                 break
-            torch.save(self.model.state_dict(), f'models/final_{self.TRAIN_RUN}_ckpt')
+            torch.save(self.model.state_dict(), f'models/sc_final_{self.TRAIN_RUN}_ckpt')
 
-        torch.save(self.model.state_dict(), f'models/final_{self.TRAIN_RUN}')
+        torch.save(self.model.state_dict(), f'models/sc_final_{self.TRAIN_RUN}')
 
         """ -- Plotting training results ----"""
 
@@ -180,7 +180,7 @@ class Trainer:
         plt.plot(epoch_plot, self.validation_loss, label="validation nll loss")
         #plt.plot([0], [0], label=f"Loss: {self.validation_loss[-1]:.2f} + N: {len(epoch_plot)}")
         plt.legend()
-        plt.savefig(f'./figs/final_{self.TRAIN_RUN}_loss.png')
+        plt.savefig(f'./figs/sc_final_{self.TRAIN_RUN}_loss.png')
 
         fig = plt.figure()
 
@@ -188,7 +188,7 @@ class Trainer:
         plt.plot(epoch_plot, self.validation_acc, label="validation accuracy")
         #plt.plot([0], [0], label=f"Acc: {self.validation_acc[-1]:.2f}")
         plt.legend()
-        plt.savefig(f'./figs/final_{self.TRAIN_RUN}_accuracy.png')
+        plt.savefig(f'./figs/sc_final_{self.TRAIN_RUN}_accuracy.png')
         """---------------------------------------"""
 
 

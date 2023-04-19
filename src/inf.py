@@ -213,7 +213,7 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/final_model_lr_0.001_depth_3_k_0.7'))
+    model.load_state_dict(torch.load('models/sc_final_model_lr_0.001_depth_3_k_0.7'))
     model.to(device)
     #model.eval()
     test_files = []
