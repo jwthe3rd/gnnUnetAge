@@ -56,7 +56,7 @@ class graphConvUnpool(nn.Module):
     def __init__(self,  act, dim, device):
         super(graphConvUnpool, self).__init__()
         self.act = act
-        self.unpoolconv = GCNConv(dim, dim)
+        self.unpoolconv = SAGEConv(dim, dim, project=True)
         self.device = device
 
     def forward(self, x_skip, e_skip, indices, x):

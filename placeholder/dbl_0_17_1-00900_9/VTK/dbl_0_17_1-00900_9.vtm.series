@@ -1,7 +1,0 @@
-{
-  "file-series-version" : "1.0",
-  "files" : [
-    { "name" : "dbl_0_17_1-00900_9_0.vtm", "time" : 0 },
-    { "name" : "dbl_0_17_1-00900_9_569.vtm", "time" : 569 }
-  ]
-}
