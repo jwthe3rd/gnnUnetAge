@@ -4,3 +4,4 @@ testRuns/
 tri/
 placeholder/
 tuning.py
+extrapTests/**/
