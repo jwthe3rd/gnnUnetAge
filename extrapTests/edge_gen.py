@@ -41,7 +41,7 @@ def gen_edge(datafile):
 
 if __name__=="__main__":
      
-    data_dir = './test_extrap/tri/'
+    data_dir = './0_52_1-111_1/'
 
     for f in os.scandir(data_dir):
 

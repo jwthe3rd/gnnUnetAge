@@ -4,5 +4,9 @@ testRuns/
 tri/
 placeholder/
 tuning.py
+<<<<<<< HEAD
 triRuns/
 placeholder/
+=======
+extrapTests/**/
+>>>>>>> c0c0b18286afbdaf1097af6904b7709bbaf0c3c7
