@@ -21,7 +21,7 @@ class bigConv(nn.Module):
         self.conv1 = SAGEConv(in_dim, out_dim, project=True, aggr='max') # SAGEConv from "Inductive Representation Learning on Large Graphs" paper
         self.act = act
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
-        self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
+        self.batchNorm = BatchNorm(out_dim, track_running_stats=False) if batchNorm else nn.Identity()
 
     def forward(self, x, edge_index):
         edge_index = add_self_loops(edge_index)[0]
@@ -39,7 +39,7 @@ class feedFWD(nn.Module):
     def __init__(self, in_dim, out_dim, act, p, batchNorm=False):
         super(feedFWD, self).__init__()
         self.lin = nn.Linear(in_dim, out_dim, bias=False)
-        self.batchNorm = BatchNorm(out_dim) if batchNorm else nn.Identity()
+        self.batchNorm = BatchNorm(out_dim, track_running_stats=False) if batchNorm else nn.Identity()
         self.drop = nn.Dropout(p=p) if p > 0.0 else nn.Identity()
         self.act = act
 

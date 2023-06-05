@@ -8,6 +8,9 @@ import torch.nn.functional as F
 from utils.dataset import gnnAgeDataSet
 from torch_geometric.loader import DataLoader
 import collections
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 """
 
 This file is in place to run inference on the trained model
@@ -64,7 +67,7 @@ def pred_to_contour(pred, data, max_iter):
     """ This function serves to generate the contour visualization for the ground truth and prediction"""
     labels_mat = []
     value_dict = collections.defaultdict(int)
-    norm_vals = np.asarray([0, 2, 5, 10, 15, 20, 25, 30, 40, 50]) # value mapping for prediction -> contour
+    norm_vals = np.asarray([0, 0.5, 1, 1.5, 2, 3, 5, 7, 9, 11]) # value mapping for prediction -> contour
     cats = 22.5*norm_vals
 
     for value in pred:
@@ -194,11 +197,11 @@ def run_test(model, data, device):
 
     e = torch.load(f'testRuns/{data}/e_{data}.pt')
     x = torch.load(f'testRuns/{data}/f_{data}.pt')
-    y = torch.load(f'testRuns/{data}/l10_{data}.pt')
+    y = torch.load(f'testRuns/{data}/lnutdiff_{data}.pt')
     print(f'Case is {data}')
     #print(data[2])
 
-    datapt = gnnAgeDataSet(feats_paths=[f'testRuns/{data}/f_{data}.pt'], edge_paths=[f'testRuns/{data}/e_{data}.pt'], label_paths=[f'testRuns/{data}/l10_{data}.pt'], test=True)
+    datapt = gnnAgeDataSet(feats_paths=[f'testRuns/{data}/f_{data}.pt'], edge_paths=[f'testRuns/{data}/e_{data}.pt'], label_paths=[f'testRuns/{data}/lnutdiff_{data}.pt'], test=True)
     loader = DataLoader(datapt, batch_size=1)
 
     for data_test in loader:
@@ -206,6 +209,11 @@ def run_test(model, data, device):
         out, indcs = model(data_test, test=True)
         loss = F.nll_loss(out, data_test.y)
         _, preds = torch.max(out, 1)
+        cf_matrix = confusion_matrix(data_test.y.cpu(), preds.cpu())
+        plt.figure()
+        sns.heatmap(cf_matrix, annot=True)
+        plt.savefig(f'/home/john/repos/gnnUnetAge/confMats/{data}_nutdiff.png')
+        plt.close()
         acc = torch.mean((preds == data_test.y).float())
     return acc.item(), loss.item(), preds, indcs
 
@@ -213,7 +221,7 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/sc_final_model_lr_0.001_depth_3_k_0.7'))
+    model.load_state_dict(torch.load('models/sc_nut_model_lr_0.001_depth_3_k_0.7'))
     model.to(device)
     #model.eval()
     test_files = []

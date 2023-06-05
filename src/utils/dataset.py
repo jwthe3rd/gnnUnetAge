@@ -56,11 +56,11 @@ class DataGenerator:
         for case in train_cases:
             edge_train.append(f'{self.path}e_{case}')
             feats_train.append(f'{self.path}f_{case}')
-            label_train.append(f'{self.path}l10_{case}')
+            label_train.append(f'{self.path}lnutdiff_{case}')
         for case in val_cases:
             edge_val.append(f'{self.path}e_{case}')
             feats_val.append(f'{self.path}f_{case}')
-            label_val.append(f'{self.path}l10_{case}')
+            label_val.append(f'{self.path}lnutdiff_{case}')
         """ ---------------------------------------------------------------"""
         if len(edge_train) != len(feats_train) or len(edge_train) != len(label_train):
             raise ValueError('mismatch in edges, labels and feats train size')
