@@ -11,11 +11,20 @@ import collections
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib
 """
 
 This file is in place to run inference on the trained model
 
 """
+
+font = {'family' : 'Times New Roman',
+        'weight' : 'bold',
+        'size'   : 32}
+plt.rcParams['figure.dpi'] =300
+plt.rcParams['figure.figsize'] = (23,16)
+matplotlib.rc('font', **font)
+
 def get_args():
     """
     Grabs all hyperparameter values from the config file specified when running ./inf.sh
@@ -197,11 +206,11 @@ def run_test(model, data, device):
 
     e = torch.load(f'testRuns/{data}/e_{data}.pt')
     x = torch.load(f'testRuns/{data}/f_{data}.pt')
-    y = torch.load(f'testRuns/{data}/lnutdiff_{data}.pt')
+    y = torch.load(f'testRuns/{data}/l10_{data}.pt')
     print(f'Case is {data}')
     #print(data[2])
 
-    datapt = gnnAgeDataSet(feats_paths=[f'testRuns/{data}/f_{data}.pt'], edge_paths=[f'testRuns/{data}/e_{data}.pt'], label_paths=[f'testRuns/{data}/lnutdiff_{data}.pt'], test=True)
+    datapt = gnnAgeDataSet(feats_paths=[f'testRuns/{data}/f_{data}.pt'], edge_paths=[f'testRuns/{data}/e_{data}.pt'], label_paths=[f'testRuns/{data}/l10_{data}.pt'], test=True)
     loader = DataLoader(datapt, batch_size=1)
 
     for data_test in loader:
@@ -212,7 +221,7 @@ def run_test(model, data, device):
         cf_matrix = confusion_matrix(data_test.y.cpu(), preds.cpu())
         plt.figure()
         sns.heatmap(cf_matrix, annot=True)
-        plt.savefig(f'/home/john/repos/gnnUnetAge/confMats/{data}_nutdiff.png')
+        plt.savefig(f'/home/john/repos/gnnUnetAge/confMats/big_{data}.png')
         plt.close()
         acc = torch.mean((preds == data_test.y).float())
     return acc.item(), loss.item(), preds, indcs
@@ -221,7 +230,7 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/sc_nut_model_lr_0.001_depth_3_k_0.7'))
+    model.load_state_dict(torch.load('models/sc_final_model_lr_0.001_depth_3_k_0.7'))
     model.to(device)
     #model.eval()
     test_files = []
