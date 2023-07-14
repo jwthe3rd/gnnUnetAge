@@ -76,7 +76,8 @@ def pred_to_contour(pred, data, max_iter):
     """ This function serves to generate the contour visualization for the ground truth and prediction"""
     labels_mat = []
     value_dict = collections.defaultdict(int)
-    norm_vals = np.asarray([0, 0.5, 1, 1.5, 2, 3, 5, 7, 9, 11]) # value mapping for prediction -> contour
+    # norm_vals = np.asarray([0, 0.5, 1, 1.5, 2, 3, 5, 7, 9, 11]) # value mapping for prediction -> contour
+    norm_vals = np.asarray([0,2,5,10,15,20,25,30,40,50])
     cats = 22.5*norm_vals
 
     for value in pred:

@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from utils.ops import bigConv, feedFWD, graphConvUnpool, Initializer
 from torch_geometric.nn.pool import TopKPooling
-
+from torch_geometric.nn import SAGEConv, BatchNorm
+from torch_geometric.utils import add_self_loops
 """
 This file contains the network architecture for the GNN U-Net Age Classifier.
 
@@ -95,10 +96,49 @@ class AgeNet(nn.Module):
         
         
 
+class vanillaSAGE(nn.Module):
 
 
+    def __init__(self, in_dim, device='cpu'):
+        super(vanillaSAGE, self).__init__()
+
+        self.conv1 = SAGEConv(in_dim, 64)
+        self.conv2 = SAGEConv(64, 128)
+        self.conv3 = SAGEConv(128,256)
+        self.conv4 = SAGEConv(256, 10)
+        self.bN1 = BatchNorm(64)
+        self.bN2 = BatchNorm(128)
+        self.bN3 = BatchNorm(256)
+        self.drop = nn.Dropout(0.2)
+        self.act = F.relu
+        self.device = device
+        self.depth = 6
+        self.k_p = 0.01
+
+    def forward(self, inpt):
+        x, edge_index = inpt.x, inpt.edge_index
+        edge_index = add_self_loops(edge_index)[0]
+
+        out = self.conv1(x, edge_index)
+        out = self.act(out)
+        out = self.bN1(out)
+        out = self.drop(out)
+
+        out = self.conv2(out, edge_index)
+        out = self.act(out)
+        out = self.bN2(out)
+        out = self.drop(out)
 
 
+        out = self.conv3(out, edge_index)
+        out = self.act(out)
+        out = self.bN3(out)
+        out = self.drop(out)
+
+
+        out = self.conv4(out, edge_index)
+        
+        return F.log_softmax(out, dim=1)
 
 
 

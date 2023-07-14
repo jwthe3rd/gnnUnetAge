@@ -22,9 +22,10 @@ print(RE_KEYS)
 
 class DataGenerator:
     """ Generates a list of data for x, edges, and ys from a directory of .pt tensors and segments to training and testing sets """
-    def __init__(self, path, seed):
+    def __init__(self, path, seed, split_data=(False, 0)):
         self.path = path
         self.seed = seed
+        self.split_data= split_data
 
     def segment_data(self, tuning=False):
         training_cases = os.listdir(self.path)
@@ -48,6 +49,31 @@ class DataGenerator:
             random.seed(68)
             unique_cases = random.sample(unique_cases, num_select)
 
+        #print(len(unique_cases))
+
+        if self.split_data == (True, "double"):
+
+            dbl_cases = []
+
+            for i, case in enumerate(unique_cases):
+                if case[0] == "d":
+                    #print(1)
+                    dbl_cases.append(case)
+
+            unique_cases = dbl_cases
+        elif self.split_data == (True, "single"):
+
+            sngl_cases = []
+
+            for case in unique_cases:
+                if case[0] != "d":
+                    sngl_cases.append(case)
+
+            unique_cases = sngl_cases
+
+#        print(len(dbl_cases))
+        #print(len(unique_cases))
+
         for case in unique_cases:
             Re_list.append(1 if len(case.split('-'))==2 else 0) # Creates a list identifying high or low Re for stratification
 
@@ -56,11 +82,11 @@ class DataGenerator:
         for case in train_cases:
             edge_train.append(f'{self.path}e_{case}')
             feats_train.append(f'{self.path}f_{case}')
-            label_train.append(f'{self.path}lnutdiff_{case}')
+            label_train.append(f'{self.path}l10_{case}')
         for case in val_cases:
             edge_val.append(f'{self.path}e_{case}')
             feats_val.append(f'{self.path}f_{case}')
-            label_val.append(f'{self.path}lnutdiff_{case}')
+            label_val.append(f'{self.path}l10_{case}')
         """ ---------------------------------------------------------------"""
         if len(edge_train) != len(feats_train) or len(edge_train) != len(label_train):
             raise ValueError('mismatch in edges, labels and feats train size')

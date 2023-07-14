@@ -2,7 +2,7 @@ import numpy as np
 import os
 import argparse
 from trainer import Trainer
-from network import AgeNet
+from network import AgeNet, vanillaSAGE
 import torch
 import torch.nn.functional as F
 
@@ -56,8 +56,8 @@ if __name__=="__main__":
 
     print(args.device)
 
-    model = AgeNet(args, conv_act=F.relu, pool_act=F.relu, device="cuda") # Sets the args and the activations, inits the network
-
+    # model = AgeNet(args, conv_act=F.relu, pool_act=F.relu, device="cuda") # Sets the args and the activations, inits the network
+    model = vanillaSAGE(in_dim=10, device="cuda")
     trainer = Trainer(args,model, torch.optim.Adam, device=model.device) # trainer class with model and optimizer passed to it.
     trainer.train() #runs training loop
     
