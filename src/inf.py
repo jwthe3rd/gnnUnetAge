@@ -1,4 +1,4 @@
-from network import AgeNet
+from network import AgeNet, vanillaSAGE
 import numpy as np
 import os
 import argparse
@@ -217,13 +217,14 @@ def run_test(model, data, device):
     for data_test in loader:
         data_test.to(device)
         out, indcs = model(data_test, test=True)
+        #out = model(data_test)
         loss = F.nll_loss(out, data_test.y)
         _, preds = torch.max(out, 1)
-        cf_matrix = confusion_matrix(data_test.y.cpu(), preds.cpu())
-        plt.figure()
-        sns.heatmap(cf_matrix, annot=True)
-        plt.savefig(f'/home/john/repos/gnnUnetAge/confMats/big_{data}.png')
-        plt.close()
+        #cf_matrix = confusion_matrix(data_test.y.cpu(), preds.cpu())
+        #plt.figure()
+        #sns.heatmap(cf_matrix, annot=True)
+        #plt.savefig(f'/home/john/repos/gnnUnetAge/confMats/sngl_big_{data}.png')
+        #plt.close()
         acc = torch.mean((preds == data_test.y).float())
     return acc.item(), loss.item(), preds, indcs
 
@@ -231,7 +232,9 @@ if __name__ == "__main__":
     device = "cuda"
     args = get_args()
     model = AgeNet(args,conv_act=F.relu, pool_act=F.relu, device=device)
-    model.load_state_dict(torch.load('models/sc_final_model_lr_0.001_depth_3_k_0.7'))
+    model.load_state_dict(torch.load('models/single_sc_model_lr_0.001_depth_3_k_0.7'))
+    #model = vanillaSAGE(in_dim=10, device="cuda")
+    #model.load_state_dict(torch.load('models/vanilla_model_lr_0.001_depth_6_k_0.01'))
     model.to(device)
     #model.eval()
     test_files = []
@@ -241,6 +244,7 @@ if __name__ == "__main__":
             test_files.append(d.name)
     for test in test_files:
         test_acc, test_loss, test_preds, indcs = run_test(model, data=test, device=device)
+        #test_acc, test_loss, test_preds = run_test(model, data=test, device=device)
         max_iter = find_max_iter(test)
         pred_to_contour(data=test, pred=test_preds, max_iter=max_iter)
         indcs_to_contour(indcs=indcs, max_iter=max_iter, data=test)

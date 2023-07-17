@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 
-DATA_FILE = 'test_results.txt'
+DATA_FILE = 'test_results_vanilla.txt'
 
 
 def data_curation(data_lines, data_type):
@@ -43,4 +43,4 @@ if __name__ == "__main__":
     print(DATA_DICT)
 
     df = pd.DataFrame(data=DATA_DICT)
-    df.to_csv('test_results.csv')
+    df.to_csv('test_results_vanilla.csv')
